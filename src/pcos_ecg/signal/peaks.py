@@ -2,7 +2,7 @@
 
 Steps: 5-15 Hz band-pass -> derivative -> square -> 150 ms moving-window integration ->
 peak picking with a 250 ms refractory period -> refine each peak to the local maximum
-of the filtered ECG. Assumes an upright R wave (true for lead II in most people).
+of the filtered ECG. Assumes an upright R wave (usual for leads I and II).
 This is a research detector, not a clinically validated one.
 """
 

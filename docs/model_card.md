@@ -13,8 +13,9 @@ validated for clinical use, and ECG alone is not an established basis for diagno
 
 ## Data
 - **Public repository:** synthetic demo data only. Metrics from it describe the generator.
-- **Study data (RIT volunteers):** not included. Population, size and label source are
-  documented in `research_protocol.md` once available.
+- **Study data (RIT pilot):** 30 volunteers recorded with an AliveCor Kardia in the
+  departmental lab; PCOS status self-reported. Not included in this repository. See
+  `research_protocol.md`.
 
 ## Evaluation design
 Participant-grouped stratified k-fold (k ≤ 5, limited by the number of minority-class
@@ -28,7 +29,10 @@ Only from report files in `runs/`. None are reproduced in this card. Paper resul
 repository.
 
 ## Known limitations
-- Small cohort: fold-to-fold variance is large; no confidence intervals are claimed.
+- Labels are self-reported, not clinically confirmed; scores measure agreement with
+  self-report.
+- Small cohort (30-participant pilot): fold-to-fold variance is large; no confidence
+  intervals are claimed.
 - Single-lead automatic morphology estimates; no expert annotation.
 - SMOTE interpolates in feature space and can produce physiologically odd combinations.
 - Bazett correction is biased at high heart rates.

@@ -97,8 +97,8 @@ def build_parser() -> argparse.ArgumentParser:
     sub = p.add_subparsers(dest="command", required=True)
 
     d = sub.add_parser("demo", help="generate synthetic data and run the whole pipeline")
-    d.add_argument("--subjects", type=int, default=40)
-    d.add_argument("--positive", type=int, default=12)
+    d.add_argument("--subjects", type=int, default=30)
+    d.add_argument("--positive", type=int, default=10)
     d.add_argument("--seed", type=int, default=7)
 
     for name, helptext in [

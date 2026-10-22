@@ -7,6 +7,10 @@
   evaluation; AIKP'26 paper, ID 141.
 - The original code and volunteer data are not available to this repository. This code
   is a rebuild (October 2026).
+- Pilot facts from the team: 30 volunteers, AliveCor Kardia, PCOS self-reported, consent
+  collected by the team, departmental permission, no ethics committee review for the
+  pilot (application submitted for the larger study), coded IDs with the key held by the
+  team. Details in `docs/research_protocol.md`.
 
 ## Decisions
 | Decision | Reason |
@@ -21,10 +25,9 @@
 | No P-wave dispersion | Needs multiple leads |
 
 ## Assumptions / open questions
-- Lead II, upright R wave (detector refines to local maximum).
+- Lead I (single-lead Kardia), upright R wave (detector refines to local maximum).
 - 50 Hz mains (India). Change `notch_hz` elsewhere.
-- Study sampling rate, device, covariates, label criteria: unknown (see
-  `docs/research_protocol.md`).
+- Kardia model, sampling rate and covariates: unknown (see `docs/research_protocol.md`).
 
 ## Status
 All phases in `PLAN.md` done except publishing. 39 tests pass locally (Python 3.13).

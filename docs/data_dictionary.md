@@ -42,17 +42,18 @@ a documented measurement or questionnaire. They are never inferred from the ECG.
 
 | Field | Status |
 |---|---|
-| Meaning of positive class | PCOS (1) vs control (0) |
+| Meaning of positive class | Self-reported PCOS (1) vs no PCOS reported (0) |
 | Label level | participant |
-| Who assigned the label, by which criteria | not yet documented |
+| Who assigned the label, by which criteria | The volunteer, by self-report; not clinically confirmed |
 | Handling of uncertain diagnoses | not yet documented |
 
 ## Provenance
 
 | Field | Value |
 |---|---|
-| Data source | RIT volunteer recordings (study data); synthetic generator (demo) |
-| Consent / approval status | not yet documented (see `research_protocol.md`) |
-| Acquisition device, leads, sampling rate | not yet documented |
+| Data source | RIT departmental pilot, 30 volunteers (study data); synthetic generator (demo) |
+| Consent / approval status | Consent collected by the project team; departmental permission; no ethics committee review for the pilot (see `research_protocol.md`) |
+| Acquisition device | AliveCor Kardia |
+| Leads, sampling rate | pending (single-lead Kardia records lead I) |
 | Known exclusions | not yet documented |
 | Synthetic-data method | demo: Gaussian-sum beat model (`demo/synthetic.py`); balancing: SMOTE on training folds |

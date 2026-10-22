@@ -8,8 +8,9 @@ for research on wearable-based screening of polycystic ovary syndrome.
 
 ## Background
 
-This was a team project at RIT Bengaluru (Medical Electronics). The team recorded ECG and
-other physiological data from volunteers under its own protocol, built an ECG pipeline
+This was a team project at RIT Bengaluru (Medical Electronics). In a pilot study in the
+departmental lab, the team recorded ECG (AliveCor Kardia) and other physiological data
+from 30 volunteers under its own protocol, with PCOS status self-reported. It built an ECG pipeline
 (preprocessing, waveform feature extraction, feature selection) with synthetic class
 balancing, and compared Random Forest, SVM and XGBoost with stratified evaluation. The
 paper was accepted at AIKP'26 (Paper ID 141).
@@ -38,7 +39,7 @@ pytest                     # 39 tests, synthetic data only
 streamlit run app/Home.py  # dashboard
 ```
 
-`pcos-ecg demo` generates 40 made-up participants (12 in the positive class, two 30 s
+`pcos-ecg demo` generates 30 made-up participants, the same size as the pilot (an arbitrary 10 in the positive class, two 30 s
 recordings each at 250 Hz), extracts features and writes a report to `runs/`. The class
 difference in the generator is arbitrary, so **the demo metrics say nothing about PCOS**.
 
@@ -95,9 +96,20 @@ and says the comparison cannot be estimated reliably.
 
 ## Data protection
 
+How the pilot data were handled:
+
+- **Consent and permission.** The project team collected consent from each volunteer, and
+  the pilot ran in the departmental lab with the competent authority's permission. It
+  did not go through an ethics committee. A review application has been submitted for
+  the larger follow-on study.
+- **Coded data.** Volunteers appear in the data files under codes, not names. Only the
+  project team holds the list linking codes to people.
 - **Volunteer data stays private.** Raw ECG is health data and can identify a person, and
   participants agreed to a study, not to publication. Nothing from the recordings
   (waveforms, features, labels, trained models) is in this repository.
+
+How this repository enforces it:
+
 - **Pseudonymous IDs only.** The pipeline expects participant codes, not names or dates
   of birth.
 - **Reports are aggregate.** QC and experiment reports contain counts and metrics only,
@@ -106,9 +118,9 @@ and says the comparison cannot be estimated reliably.
   git-ignored, and a test fails if any data file is tracked.
 - **Synthetic stand-in.** The public demo uses generated signals, labelled as synthetic
   wherever they appear.
-- **Documentation gaps are marked.** Consent and ethics details are recorded in
-  [`docs/research_protocol.md`](docs/research_protocol.md); fields stay "pending" until
-  backed by the study paperwork.
+- **Documentation gaps are marked.** The protocol is recorded in
+  [`docs/research_protocol.md`](docs/research_protocol.md); details not yet documented
+  stay "pending" rather than being guessed.
 
 A sibling project, **dp-ecg**, applies differential privacy to ECG features from the
 public PTB-XL dataset. It asks how aggregate results from a study like this one could
@@ -126,8 +138,9 @@ docs/           architecture, data dictionary, protocol template, model card, de
 
 ## Limitations
 
-- Small cohorts make cross-validated scores unstable, and internal CV is not external
-  validation.
+- PCOS status in the pilot was self-reported, not clinically confirmed.
+- With 30 participants, cross-validated scores are unstable, and internal CV is not
+  external validation.
 - Morphology features are automatic single-lead estimates, not expert annotations.
 - SMOTE interpolates between participants in feature space; the synthetic rows are not
   extra volunteers.

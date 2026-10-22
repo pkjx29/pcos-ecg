@@ -18,7 +18,7 @@ Column names are mapped in `configs/local_data.yaml` (copy from
 |---|---|
 | `subject_id` | pseudonymous participant code (no names, phone numbers or dates of birth) |
 | `record_id` | one recording session; belongs to exactly one participant |
-| `lead` | e.g. `II` |
+| `lead` | e.g. `I` (single-lead Kardia) |
 | `sample_index` | 0, 1, 2 … within the record |
 | `sample_rate_hz` | constant within a record |
 | `amplitude` | in mV (or µV with `amplitude_unit: uV`) |

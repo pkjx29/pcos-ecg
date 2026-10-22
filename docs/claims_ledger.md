@@ -5,7 +5,7 @@ Each CV claim, and what in this repository supports it.
 | Claim | Evidence here | Status |
 |---|---|---|
 | Team project at RIT | – | Not verifiable from this repo (institutional record) |
-| Recorded ECG and physiological data from volunteers under our own protocol | `docs/research_protocol.md` template; loaders for that data | **Not verified here**: data is private; protocol fields pending |
+| Recorded ECG and physiological data from volunteers under our own protocol | `docs/research_protocol.md`: 30 volunteers, AliveCor Kardia, departmental pilot, team-collected consent | Documented by the team; data private, so not verifiable from this repo |
 | Built the ECG pipeline: preprocessing | `signal/preprocess.py`, tests in `tests/test_signal.py` | Implemented (rebuilt) |
 | … waveform feature extraction | `signal/peaks.py`, `signal/features.py`, tests | Implemented (rebuilt) |
 | … feature selection | `SelectKBest(mutual_info)` inside each fold, `models/factory.py` | Implemented (rebuilt) |

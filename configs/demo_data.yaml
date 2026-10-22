@@ -13,7 +13,7 @@ waveforms:
     sample_rate_hz: sample_rate_hz
     amplitude: amplitude
   amplitude_unit: mV
-  lead: II
+  lead: I
 
 labels:
   path: data/demo/labels.csv

@@ -79,8 +79,8 @@ def synth_ecg(
 
 
 def make_demo_cohort(
-    n_subjects: int = 40,
-    n_positive: int = 12,
+    n_subjects: int = 30,
+    n_positive: int = 10,
     records_per_subject: int = 2,
     duration_s: float = 30.0,
     fs: float = 250.0,
@@ -117,7 +117,7 @@ def make_demo_cohort(
                     {
                         "subject_id": sid,
                         "record_id": f"{sid}-R{r}",
-                        "lead": "II",
+                        "lead": "I",
                         "sample_index": np.arange(sig.size),
                         "sample_rate_hz": fs,
                         "amplitude": np.round(sig, 5),
