@@ -21,9 +21,7 @@ def process_record(x: np.ndarray, fs: float, cfg: dict) -> tuple[dict, list[str]
     Returns (feature values, quality-failure reasons, per-feature failure reasons).
     """
     q, p = cfg["quality"], cfg["preprocessing"]
-    quality = check_quality(
-        x, fs, q["min_duration_s"], q["max_abs_mv"], q["flatline_s"]
-    )
+    quality = check_quality(x, fs, q["min_duration_s"], q["max_abs_mv"], q["flatline_s"])
     if not quality.ok:
         values = {name: np.nan for name in FEATURE_UNITS}
         values["n_beats"] = 0

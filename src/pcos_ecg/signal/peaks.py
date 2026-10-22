@@ -37,10 +37,17 @@ def detect_r_peaks(ecg_filtered: np.ndarray, fs: float) -> np.ndarray:
 
 def clean_rr(peaks: np.ndarray, fs: float) -> np.ndarray:
     """RR intervals in seconds, dropping physiologically implausible ones and those more
-    than 20% away from the median (likely missed or extra beats)."""
+    than 20% away from the median (likely missed or extra beats). A wrong peak corrupts
+    both intervals it touches, so neighbours of a rejected interval are dropped too."""
     rr = np.diff(peaks) / fs
-    rr = rr[(rr >= MIN_RR_S) & (rr <= MAX_RR_S)]
     if rr.size == 0:
         return rr
-    med = np.median(rr)
-    return rr[np.abs(rr - med) <= 0.2 * med]
+    plausible = (rr >= MIN_RR_S) & (rr <= MAX_RR_S)
+    if not plausible.any():
+        return rr[:0]
+    med = np.median(rr[plausible])
+    bad = ~plausible | (np.abs(rr - med) > 0.2 * med)
+    spread = bad.copy()
+    spread[1:] |= bad[:-1]
+    spread[:-1] |= bad[1:]
+    return rr[~spread]

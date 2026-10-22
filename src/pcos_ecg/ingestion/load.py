@@ -12,7 +12,14 @@ import pandas as pd
 
 from pcos_ecg.config import ConfigError, resolve
 
-WAVEFORM_COLUMNS = ["subject_id", "record_id", "lead", "sample_index", "sample_rate_hz", "amplitude"]
+WAVEFORM_COLUMNS = [
+    "subject_id",
+    "record_id",
+    "lead",
+    "sample_index",
+    "sample_rate_hz",
+    "amplitude",
+]
 UNIT_TO_MV = {"mV": 1.0, "uV": 1e-3}
 
 
@@ -72,7 +79,9 @@ def load_labels(cfg: dict) -> pd.DataFrame:
     df["subject_id"] = df["subject_id"].astype(str)
 
     if df["raw_label"].isna().any():
-        raise DataValidationError(f"{int(df['raw_label'].isna().sum())} participant(s) lack a label")
+        raise DataValidationError(
+            f"{int(df['raw_label'].isna().sum())} participant(s) lack a label"
+        )
     values = set(df["raw_label"].unique())
     if len(values) > 2:
         raise DataValidationError(f"Expected a binary label, found {len(values)} distinct values")

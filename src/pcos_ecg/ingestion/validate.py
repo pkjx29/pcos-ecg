@@ -31,13 +31,17 @@ def validate_waveforms(df: pd.DataFrame) -> dict:
 
     owners = df.groupby("record_id")["subject_id"].nunique()
     if (owners > 1).any():
-        raise DataValidationError(f"{int((owners > 1).sum())} record_id(s) belong to >1 participant")
+        raise DataValidationError(
+            f"{int((owners > 1).sum())} record_id(s) belong to >1 participant"
+        )
 
     non_monotonic = df.groupby("record_id")["sample_index"].apply(
         lambda s: not s.is_monotonic_increasing or s.duplicated().any()
     )
     if non_monotonic.any():
-        issues.append(f"{int(non_monotonic.sum())} record(s) have unsorted or repeated sample_index")
+        issues.append(
+            f"{int(non_monotonic.sum())} record(s) have unsorted or repeated sample_index"
+        )
 
     n_nonfinite = int((~np.isfinite(df["amplitude"].to_numpy(dtype=float))).sum())
     if n_nonfinite:

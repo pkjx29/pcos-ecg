@@ -47,13 +47,17 @@ def prepare_xy(df: pd.DataFrame, cfg: dict) -> tuple[pd.DataFrame, np.ndarray, n
         raise ValueError("No numeric predictor columns left after exclusions")
 
     if cfg.get("aggregate_to_subject"):
-        agg = df.groupby(sid).agg({**dict.fromkeys(cols, cfg["aggregate_to_subject"]), label: "first"})
+        agg = df.groupby(sid).agg(
+            {**dict.fromkeys(cols, cfg["aggregate_to_subject"]), label: "first"}
+        )
         df = agg.reset_index()
     X = df[cols].astype(float)
     keep = X.notna().any(axis=1)
-    return X[keep].reset_index(drop=True), df.loc[keep, label].to_numpy(int), df.loc[
-        keep, sid
-    ].astype(str).to_numpy()
+    return (
+        X[keep].reset_index(drop=True),
+        df.loc[keep, label].to_numpy(int),
+        df.loc[keep, sid].astype(str).to_numpy(),
+    )
 
 
 def choose_n_splits(y: np.ndarray, groups: np.ndarray, max_splits: int, min_per_fold: int) -> int:
@@ -82,7 +86,9 @@ def run_experiment(
 ) -> dict:
     seed = int(cfg["seed"])
     cv_cfg, smote_cfg = cfg["cv"], cfg.get("smote", {})
-    n_splits = choose_n_splits(y, groups, cv_cfg["max_splits"], cv_cfg["min_subjects_per_class_per_fold"])
+    n_splits = choose_n_splits(
+        y, groups, cv_cfg["max_splits"], cv_cfg["min_subjects_per_class_per_fold"]
+    )
     splitter = StratifiedGroupKFold(n_splits=n_splits, shuffle=True, random_state=seed)
     folds = list(splitter.split(X, y, groups))
 
@@ -147,9 +153,7 @@ def run_experiment(
 
     fold_df = pd.DataFrame(per_fold)
     summary = (
-        fold_df.groupby(["model", "condition"])[list(SUMMARY_METRICS)]
-        .agg(["mean", "std"])
-        .round(3)
+        fold_df.groupby(["model", "condition"])[list(SUMMARY_METRICS)].agg(["mean", "std"]).round(3)
     )
     summary.columns = [f"{m}_{s}" for m, s in summary.columns]
     summary = summary.reset_index()
