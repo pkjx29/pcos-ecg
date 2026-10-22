@@ -122,10 +122,6 @@ How this repository enforces it:
   [`docs/research_protocol.md`](docs/research_protocol.md); details not yet documented
   stay "pending" rather than being guessed.
 
-A sibling project, **dp-ecg**, applies differential privacy to ECG features from the
-public PTB-XL dataset. It asks how aggregate results from a study like this one could
-be shared with formal privacy guarantees.
-
 ## Repository layout
 
 ```
