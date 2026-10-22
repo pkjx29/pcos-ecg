@@ -1,0 +1,31 @@
+# Model comparison settings. Copy to configs/local_experiment.yaml (git-ignored) for study data.
+
+data_mode: study
+features_path: data/private/features.csv
+label_column: label                 # 1 = positive (PCOS), 0 = control
+subject_column: subject_id
+aggregate_to_subject: median        # one row per participant before modelling; null to keep records
+exclude_columns: [record_id, n_beats, quality_ok]   # never used as predictors
+feature_columns: null               # null = every remaining numeric column
+
+seed: 42
+
+cv:
+  max_splits: 5                     # reduced automatically to what the minority class supports
+  min_subjects_per_class_per_fold: 2
+
+feature_selection:
+  method: mutual_info               # mutual_info | none ; fitted inside each training fold
+  k: 8
+
+# real_only    : no rebalancing
+# class_weight : cost-sensitive learning (NOT synthetic data)
+# smote        : SMOTE synthetic minority rows, generated from the training fold only
+conditions: [real_only, class_weight, smote]
+models: [baseline, random_forest, svm, xgboost]
+
+smote:
+  k_neighbors: 3
+  min_minority_subjects: 4          # below this, SMOTE is skipped for the fold and flagged
+
+output_dir: runs

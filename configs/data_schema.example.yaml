@@ -1,0 +1,45 @@
+# Data schema for STUDY data. Copy to configs/local_data.yaml (git-ignored) and edit.
+# Paths are relative to the repository root. Never commit a config that points at
+# real participant files outside data/private/.
+
+data_mode: study              # "study" or "synthetic_demo"; written into every report
+
+waveforms:
+  path: data/private/ecg_long.csv   # long-form CSV, one row per sample
+  columns:                          # map: pipeline name -> column name in your file
+    subject_id: subject_id          # pseudonymous participant ID (no names / DOB)
+    record_id: record_id            # one recording session
+    lead: lead
+    sample_index: sample_index      # 0, 1, 2, ... within a record
+    sample_rate_hz: sample_rate_hz
+    amplitude: amplitude
+  amplitude_unit: mV                # mV or uV; uV is converted to mV on load
+  lead: II                          # lead used for feature extraction
+
+labels:
+  path: data/private/labels.csv
+  subject_id: subject_id
+  label: pcos_label
+  positive_value: 1                 # value that means "PCOS" (positive class)
+  label_level: participant          # labels are per participant, not per record
+  label_source: not yet documented  # e.g. "Rotterdam criteria, confirmed by clinician"
+
+covariates:                         # optional, NOT derived from ECG
+  path: null                        # e.g. data/private/covariates.csv
+  subject_id: subject_id
+  columns: []                       # e.g. [BMI, Cycle_Length]
+
+preprocessing:
+  bandpass_hz: [0.5, 40.0]          # validated against Nyquist at load time
+  notch_hz: 50.0                    # India mains = 50 Hz; set null to disable
+  filter_order: 4
+
+quality:
+  min_duration_s: 10
+  max_abs_mv: 10.0                  # beyond this the trace is treated as clipped/corrupt
+  flatline_s: 2.0                   # a run this long with ~zero change is flagged
+  min_beats: 8
+
+output:
+  features_path: data/private/features.csv
+  qc_report_path: data/private/qc_report.json

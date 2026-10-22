@@ -1,0 +1,28 @@
+# SYNTHETIC DEMO ONLY. Metrics from this config describe the toy generator, not PCOS.
+
+data_mode: synthetic_demo
+features_path: data/demo/features.csv
+label_column: label
+subject_column: subject_id
+aggregate_to_subject: median
+exclude_columns: [record_id, n_beats, quality_ok]
+feature_columns: null
+
+seed: 42
+
+cv:
+  max_splits: 5
+  min_subjects_per_class_per_fold: 2
+
+feature_selection:
+  method: mutual_info
+  k: 8
+
+conditions: [real_only, class_weight, smote]
+models: [baseline, random_forest, svm, xgboost]
+
+smote:
+  k_neighbors: 3
+  min_minority_subjects: 4
+
+output_dir: runs

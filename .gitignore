@@ -1,0 +1,39 @@
+# --- Study data: never commit (see data/README.md) ---
+data/private/
+data/raw/
+data/interim/
+data/demo/
+*.edf
+*.dat
+*.hea
+*.atr
+*.mat
+consent*/
+**/participants*.csv
+
+# Local configs may contain private paths
+configs/local_*.yaml
+
+# Experiment outputs and model artifacts (may be derived from private data)
+runs/
+*.joblib
+*.pkl
+*.pickle
+*.ubj
+
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Python / tooling
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.DS_Store

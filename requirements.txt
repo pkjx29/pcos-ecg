@@ -1,0 +1,2 @@
+# Used by Streamlit Community Cloud; mirrors pyproject.toml (installs the package itself).
+.[app]

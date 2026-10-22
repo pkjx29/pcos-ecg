@@ -1,0 +1,44 @@
+# SYNTHETIC DEMO ONLY. Used by `pcos-ecg demo`. Files under data/demo/ are generated,
+# contain no real people, and are git-ignored.
+
+data_mode: synthetic_demo
+
+waveforms:
+  path: data/demo/ecg_long.csv
+  columns:
+    subject_id: subject_id
+    record_id: record_id
+    lead: lead
+    sample_index: sample_index
+    sample_rate_hz: sample_rate_hz
+    amplitude: amplitude
+  amplitude_unit: mV
+  lead: II
+
+labels:
+  path: data/demo/labels.csv
+  subject_id: subject_id
+  label: label
+  positive_value: 1
+  label_level: participant
+  label_source: synthetic generator (no clinical meaning)
+
+covariates:
+  path: null
+  subject_id: subject_id
+  columns: []
+
+preprocessing:
+  bandpass_hz: [0.5, 40.0]
+  notch_hz: 50.0
+  filter_order: 4
+
+quality:
+  min_duration_s: 10
+  max_abs_mv: 10.0
+  flatline_s: 2.0
+  min_beats: 8
+
+output:
+  features_path: data/demo/features.csv
+  qc_report_path: data/demo/qc_report.json
