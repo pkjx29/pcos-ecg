@@ -122,6 +122,11 @@ How this repository enforces it:
   [`docs/research_protocol.md`](docs/research_protocol.md); details not yet documented
   stay "pending" rather than being guessed.
 
+A sibling project, [dp-ecg](https://github.com/pkjx29/dp-ecg), takes the privacy
+question further on the public PTB-XL dataset: Laplace and Gaussian mechanisms for
+private summary statistics, DP-SGD training of an ECG classifier, and a membership-
+inference attack to test what the privacy budget protects in practice.
+
 ## Repository layout
 
 ```
