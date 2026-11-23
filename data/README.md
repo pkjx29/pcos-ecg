@@ -23,6 +23,11 @@ Column names are mapped in `configs/local_data.yaml` (copy from
 | `sample_rate_hz` | constant within a record |
 | `amplitude` | in mV (or µV with `amplitude_unit: uV`) |
 
+**From Kardia PDFs:** `pcos-ecg import-kardia` writes this file from the PDF exports. It
+recovers the vector trace (300 Hz, 25 mm/s, 10 mm/mV, checked against the 1 mm grid),
+re-centres each printed strip on its median, and assigns IDs from a mapping CSV
+(`file, subject_id, record_id`). The PDFs' text is discarded before parsing.
+
 **Labels** (`labels.csv`): `subject_id`, label column. One label per participant.
 
 **Covariates** (optional): `subject_id` plus measured or self-reported fields such as BMI.

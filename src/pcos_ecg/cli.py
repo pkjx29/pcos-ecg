@@ -30,6 +30,14 @@ DEMO_DATA_CFG = "configs/demo_data.yaml"
 DEMO_EXP_CFG = "configs/demo_experiment.yaml"
 
 
+def cmd_import_kardia(mapping: str, out: str) -> dict:
+    from pcos_ecg.ingestion.kardia_pdf import import_kardia_folder
+
+    summary = import_kardia_folder(resolve(mapping), resolve(out))
+    print(json.dumps(summary, indent=2))
+    return summary
+
+
 def cmd_validate(data_cfg: dict) -> dict:
     waves = load_waveforms(data_cfg)
     labels = load_labels(data_cfg)
@@ -171,6 +179,12 @@ def build_parser() -> argparse.ArgumentParser:
     d.add_argument("--positive", type=int, default=10)
     d.add_argument("--seed", type=int, default=7)
 
+    k = sub.add_parser(
+        "import-kardia", help="convert Kardia PDF exports into the long-form waveform file"
+    )
+    k.add_argument("--mapping", required=True, help="CSV with columns file, subject_id, record_id")
+    k.add_argument("--out", required=True, help="output CSV, e.g. data/private/ecg_long.csv")
+
     for name, helptext in [
         ("validate-data", "check schema, sampling rates and labels (counts only)"),
         ("extract-features", "quality-check recordings and build the participant feature table"),
@@ -190,6 +204,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "demo":
             cmd_demo(args.subjects, args.positive, args.seed)
+        elif args.command == "import-kardia":
+            cmd_import_kardia(args.mapping, args.out)
         elif args.command == "validate-data":
             cmd_validate(load_config(args.config))
         elif args.command == "extract-features":
@@ -199,6 +215,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "train-evaluate":
             cmd_train(load_config(args.config))
     except (ConfigError, DataValidationError, FilterConfigError, NotEstimableError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    except ValueError as exc:  # KardiaPDFError and malformed inputs
         print(f"error: {exc}", file=sys.stderr)
         return 2
     return 0

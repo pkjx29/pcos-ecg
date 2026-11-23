@@ -19,6 +19,7 @@ flowchart TD
 |---|---|
 | `config.py` | YAML loading, `data_mode` check, path resolution (relative to the working directory) |
 | `ingestion/load.py` | Read CSVs, map columns, convert µV→mV, binary label mapping, conflict checks |
+| `ingestion/kardia_pdf.py` | Recovers the single-lead trace from Kardia PDF exports (vector strokes, grid-checked scale); never reads the PDF text |
 | `ingestion/validate.py` | Fatal and non-fatal structural checks; returns counts only |
 | `signal/preprocess.py`, `signal/peaks.py`, `signal/features.py` | Built-in "scipy" backend: quality checks, band-pass + notch, Pan–Tompkins-style R peaks, median-beat intervals |
 | `signal/nk_features.py` | "neurokit2" backend: NeuroKit2 cleaning, R peaks, wavelet delineation, per-beat plausibility checks, single-lead P-wave dispersion proxy |
