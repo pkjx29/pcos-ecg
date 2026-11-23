@@ -65,12 +65,17 @@ def test_no_data_files_are_tracked():
 
 AGGREGATE_DIR = "original_study/04_Results/"
 ID_COLUMN = re.compile(r"subject|participant|record_id|patient|\bname\b", re.IGNORECASE)
+# The original feature selection wrongly fed Subject_ID in as a feature, so this matrix has a
+# "cat__Subject_ID" column. It holds correlation coefficients, not identifiers.
+REVIEWED_TABLES = {AGGREGATE_DIR + "04_Feature_Selection_Results/tables/correlation_matrix.csv"}
 
 
 def _is_aggregate_result(path: str) -> bool:
     """Published summary tables from the original study: CSVs whose columns carry no IDs."""
     if not (path.startswith(AGGREGATE_DIR) and path.endswith(".csv")):
         return False
+    if path in REVIEWED_TABLES:
+        return True
     with (REPO / path).open(encoding="utf-8", errors="replace") as fh:
         header = next(csv.reader(fh), [])
     return not any(ID_COLUMN.search(col) for col in header)
