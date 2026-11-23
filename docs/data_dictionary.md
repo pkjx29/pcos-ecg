@@ -1,28 +1,42 @@
 # Data dictionary
 
-All ECG features are computed per recording from one lead, then summarised per
-participant (median) before modelling. "Estimate" means an automatic measurement that
-has not been checked against expert annotation.
+Column names follow the original study's notebooks. ECG features are computed per
+recording from one lead, then summarised per participant (median of quality-checked
+recordings). "Estimate" means an automatic measurement not checked against expert
+annotation. The default extraction backend is NeuroKit2 (`signal/nk_features.py`); the
+built-in "scipy" backend measures the same intervals except P-wave dispersion.
 
-## ECG-derived features
+## ECG features (measured)
 
-| Column | Unit | Definition | Source | Plausible range | Notes |
-|---|---|---|---|---|---|
-| `n_beats` | count | R peaks detected | waveform | – | Excluded from predictors |
-| `mean_hr_bpm` | beats/min | 60 / mean cleaned RR | waveform | – | |
-| `mean_rr_s` | s | mean cleaned RR interval | waveform | 0.3–2.0 per interval | RR within 20% of median; neighbours of rejected RR dropped |
-| `hrv_sdnn_estimate_s` | s | SD of cleaned RR (ddof 1) | waveform | – | Short-term only; recordings are short |
-| `hrv_rmssd_s` | s | RMS of successive RR differences | waveform | – | |
-| `sdnn_meanrr_ratio` | – | SDNN / mean RR | waveform | – | Coefficient of variation of RR |
-| `pr_interval_s` | s | P onset → QRS onset on median beat | waveform | 0.08–0.30 | Estimate; NaN if P not above noise |
-| `qrs_duration_s` | s | QRS onset → offset (5% of R amplitude) | waveform | 0.04–0.20 | Estimate |
-| `qt_interval_s` | s | QRS onset → T end (10% of T amplitude) | waveform | 0.20–0.60 | Threshold method, not tangent method |
-| `qtc_bazett_s` | s | QT / √(mean RR) | waveform | – | Bazett over-corrects at high heart rates |
-| `t_wave_duration_s` | s | T onset → T end (10% threshold) | waveform | 0.05–0.40 | Estimate |
-| `r_amplitude_mv` | mV | R peak minus PR-segment level | waveform | – | Depends on electrode placement |
+| Column | Unit | Definition (NeuroKit2 backend) | Plausible range per beat | Notes |
+|---|---|---|---|---|
+| `HRV_SDNN_Estimate` | ms | SD of cleaned RR intervals (ddof 1) | – | Short-term only; recordings are about 30 s |
+| `Mean_RR_Interval` | s | Mean cleaned RR interval | 0.3–2.0 | RR within 20% of median; neighbours of a rejected RR dropped |
+| `PR_Interval` | s | P onset → QRS onset, median over beats | 0.08–0.30 | Wavelet delineation |
+| `QRS_Duration` | s | QRS onset → offset, median over beats | 0.04–0.20 | |
+| `QT_Interval` | s | QRS onset → T offset, median over beats | 0.20–0.60 | |
+| `QTc_Bazett` | s | QT / √(mean RR) | – | Bazett over-corrects at high heart rates |
+| `T_Wave_Duration` | s | T onset → T offset, median over beats | 0.05–0.40 | |
+| `P_Wave_Dispersion` | s | **Single-lead proxy:** 95th − 5th percentile of P-wave duration across beats | P duration 0.04–0.20 | Classical P-wave dispersion is max − min P duration across 12 leads and cannot be measured from one lead. This is a different quantity, kept under the study's name so results line up |
 
-**Not computed:** P-wave dispersion (max − min P duration across leads). A single lead
-cannot support it, so no single-lead stand-in is reported under that name.
+A value is NaN with a recorded reason when too few beats give a plausible measurement.
+
+## Engineered features (row-wise formulas, report section 3.5.4)
+
+| Column | Formula | Unit |
+|---|---|---|
+| `SDNN_MeanRR_Ratio` | (SDNN in s) / Mean RR | unitless (coefficient of variation of RR) |
+| `QTc_MeanRR_Ratio` | QTc / Mean RR | 1/s |
+| `PWaveDisp_x_QTc` | P_Wave_Dispersion × QTc | s² |
+| `HRVSDNN_x_QTc` | SDNN (ms) × QTc | ms·s |
+
+The report does not state the units it used for SDNN / Mean RR; here both are in seconds.
+
+## The study's final 10 features (feature sets in the experiment config)
+
+- **ECG (6):** HRV_SDNN_Estimate, P_Wave_Dispersion, SDNN_MeanRR_Ratio, QTc_Bazett,
+  PR_Interval, T_Wave_Duration
+- **Physiological (4):** Cycle_Length, Cycle_Regularity, BMI, Family_History
 
 ## Record bookkeeping (never predictors)
 
@@ -56,4 +70,4 @@ a documented measurement or questionnaire. They are never inferred from the ECG.
 | Acquisition device | AliveCor Kardia |
 | Leads, sampling rate | pending (single-lead Kardia records lead I) |
 | Known exclusions | not yet documented |
-| Synthetic-data method | demo: Gaussian-sum beat model (`demo/synthetic.py`); balancing: SMOTE on training folds |
+| Synthetic-data method | demo: Gaussian-sum beat model and made-up covariates (`demo/synthetic.py`); expansion: class-conditional Gaussian on each fold's training participants (SDV Gaussian Copula or CTGAN optional); SMOTE only as a baseline |

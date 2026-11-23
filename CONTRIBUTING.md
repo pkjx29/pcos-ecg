@@ -12,8 +12,8 @@ status, `docs/architecture.md` for the module map.
   `data/private/`. Reports hold counts and metrics only.
 - Never invent results, sample sizes, consent/ethics facts or paper numbers. Unknowns stay
   "pending" / "not yet documented".
-- Anything that learns (imputer, scaler, selector, SMOTE, model) goes inside the
-  per-fold `Pipeline`. Split by participant. No threshold or hyperparameter tuning on
+- Anything that learns (synthesizer, feature selector, imputer, scaler, model) is fitted on
+  the training participants of a fold only. Split by real participant first. No threshold or hyperparameter tuning on
   evaluation folds.
 - Failed measurements are NaN plus a reason, never 0.
 - Study-data commands must not fall back to demo data.
