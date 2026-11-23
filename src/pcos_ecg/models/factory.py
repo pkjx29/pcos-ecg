@@ -77,7 +77,7 @@ def make_pipeline(
     if condition not in CONDITIONS:
         raise ValueError(f"Unknown condition {condition!r}; choose from {CONDITIONS}")
     steps = [
-        ("impute", SimpleImputer(strategy="median")),
+        ("impute", SimpleImputer(strategy="median", keep_empty_features=True)),
         ("scale", StandardScaler()),
     ]
     if k_best is not None and k_best < n_features:

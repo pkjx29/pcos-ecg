@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from pcos_ecg.demo.synthetic import make_demo_cohort
+from pcos_ecg.demo.synthetic import make_demo_cohort, make_demo_covariates
 
 REPO = Path(__file__).resolve().parents[1]
 
@@ -22,9 +22,13 @@ def data_cfg(tmp_path, small_cohort):
     waves, labels = small_cohort
     waves.to_csv(tmp_path / "ecg_long.csv", index=False)
     labels.to_csv(tmp_path / "labels.csv", index=False)
+    make_demo_covariates(labels, seed=3).to_csv(tmp_path / "covariates.csv", index=False)
     cfg = yaml.safe_load((REPO / "configs" / "demo_data.yaml").read_text())
     cfg["waveforms"]["path"] = str(tmp_path / "ecg_long.csv")
     cfg["labels"]["path"] = str(tmp_path / "labels.csv")
+    cfg["covariates"]["path"] = str(tmp_path / "covariates.csv")
+    # The fast built-in backend keeps the core tests independent of the 'study' extra.
+    cfg["signal"] = {"backend": "scipy"}
     cfg["output"] = {
         "features_path": str(tmp_path / "features.csv"),
         "qc_report_path": str(tmp_path / "qc.json"),

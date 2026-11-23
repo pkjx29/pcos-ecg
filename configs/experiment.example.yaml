@@ -4,7 +4,7 @@ data_mode: study
 features_path: data/private/features.csv
 label_column: label                 # 1 = positive (PCOS), 0 = control
 subject_column: subject_id
-aggregate_to_subject: median        # one row per participant before modelling; null to keep records
+aggregate_to_subject: null        # extract-features already writes one row per participant
 exclude_columns: [record_id, n_beats, quality_ok]   # never used as predictors
 feature_columns: null               # null = every remaining numeric column
 

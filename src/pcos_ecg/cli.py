@@ -15,6 +15,7 @@ import pandas as pd
 from pcos_ecg.config import ConfigError, load_config, resolve
 from pcos_ecg.evaluation.cv import NotEstimableError, prepare_xy, run_experiment
 from pcos_ecg.features.build import build_feature_table
+from pcos_ecg.features.study import participant_table
 from pcos_ecg.ingestion.load import (
     DataValidationError,
     load_covariates,
@@ -46,7 +47,8 @@ def cmd_extract(data_cfg: dict) -> dict:
     labels = load_labels(data_cfg)
     validate_waveforms(waves)
     validate_cohort(labels, waves["subject_id"])
-    table, qc = build_feature_table(waves, labels, data_cfg, load_covariates(data_cfg))
+    records, qc = build_feature_table(waves, data_cfg)
+    table = participant_table(records, labels, load_covariates(data_cfg))
 
     out = resolve(data_cfg["output"]["features_path"])
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -54,7 +56,7 @@ def cmd_extract(data_cfg: dict) -> dict:
     resolve(data_cfg["output"]["qc_report_path"]).write_text(json.dumps(qc, indent=2))
     print(
         f"Features for {qc['n_records_quality_ok']}/{qc['n_records']} records "
-        f"({qc['n_subjects']} participants) written to {out}"
+        f"({len(table)} participants, {qc['signal_backend']} backend) written to {out}"
     )
     return qc
 

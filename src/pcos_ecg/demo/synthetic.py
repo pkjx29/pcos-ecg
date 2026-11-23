@@ -128,12 +128,40 @@ def make_demo_cohort(
     return pd.concat(frames, ignore_index=True), pd.DataFrame(label_rows)
 
 
-def write_demo_cohort(out_dir: str | Path, **kwargs) -> tuple[Path, Path]:
+def make_demo_covariates(labels: pd.DataFrame, seed: int = 7) -> pd.DataFrame:
+    """The study's four physiological features for the synthetic participants.
+
+    Class differences are arbitrary, like the ECG ones: they exist only so the demo has
+    something to find, and say nothing about real PCOS.
+    """
+    rng = np.random.default_rng(seed + 1)
+    rows = []
+    for sid, y in zip(labels["subject_id"], labels["label"], strict=True):
+        rows.append(
+            {
+                "subject_id": sid,
+                "Cycle_Length": round(float(rng.normal(36 if y else 29, 6 if y else 3)), 1),
+                "Cycle_Regularity": "Irregular"
+                if rng.random() < (0.6 if y else 0.2)
+                else "Regular",
+                "BMI": round(float(rng.normal(25.5 if y else 22.5, 3.5)), 1),
+                "Family_History": "Yes" if rng.random() < (0.4 if y else 0.15) else "No",
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def write_demo_cohort(out_dir: str | Path, **kwargs) -> tuple[Path, Path, Path]:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     wave, labels = make_demo_cohort(**kwargs)
-    wave_path, label_path = out / "ecg_long.csv", out / "labels.csv"
+    wave_path, label_path, cov_path = (
+        out / "ecg_long.csv",
+        out / "labels.csv",
+        out / "covariates.csv",
+    )
     wave.to_csv(wave_path, index=False)
     labels.to_csv(label_path, index=False)
+    make_demo_covariates(labels, seed=kwargs.get("seed", 7)).to_csv(cov_path, index=False)
     (out / "README.txt").write_text(SYNTHETIC_NOTICE + "\n")
-    return wave_path, label_path
+    return wave_path, label_path, cov_path
