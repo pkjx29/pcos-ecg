@@ -1,128 +1,161 @@
-"""Leakage, grouping and metric edge cases for the model comparison."""
+"""Leakage, grouping and metric edge cases for the study-method evaluation."""
 
 import numpy as np
 import pandas as pd
 import pytest
-from imblearn.pipeline import Pipeline
-from sklearn.base import BaseEstimator, TransformerMixin
 
-from pcos_ecg.evaluation.cv import NotEstimableError, choose_n_splits, prepare_xy, run_experiment
+from pcos_ecg.evaluation.cv import NotEstimableError, make_splits, prepare_table, run_experiment
 from pcos_ecg.evaluation.metrics import binary_metrics
-from pcos_ecg.models.factory import make_pipeline
+from pcos_ecg.models.ensemble import WeightedSoftVote
 from pcos_ecg.synthesis.balance import make_balancer
+from pcos_ecg.synthesis.generators import make_synthesizer
+
+ECG = ["HRV_SDNN_Estimate", "QTc_Bazett"]
+PHYS = ["BMI", "Cycle_Regularity"]
 
 
-def _toy(n_subj=30, n_pos=10, records=3, seed=0):
-    """Repeated records per participant, so grouping actually matters."""
+def _table(n_subj=30, n_pos=12, seed=0):
+    """One row per participant, with the label carried by both feature groups."""
     rng = np.random.default_rng(seed)
-    rows = []
-    for s in range(n_subj):
-        y = int(s < n_pos)
-        centre = rng.normal(y, 1.0, 4)
-        for r in range(records):
-            rows.append(
-                {"subject_id": f"S{s}", "record_id": f"S{s}-{r}", "label": y}
-                | {f"f{j}": centre[j] + rng.normal(0, 0.3) for j in range(4)}
-            )
-    return pd.DataFrame(rows)
+    y = np.array([1] * n_pos + [0] * (n_subj - n_pos))
+    return pd.DataFrame(
+        {
+            "subject_id": [f"P{i:02d}" for i in range(n_subj)],
+            "label": y,
+            "HRV_SDNN_Estimate": rng.normal(45 - 8 * y, 6),
+            "QTc_Bazett": rng.normal(0.41 + 0.01 * y, 0.01),
+            "BMI": rng.normal(23 + 3 * y, 2),
+            "Cycle_Regularity": (rng.random(n_subj) < 0.2 + 0.5 * y).astype(float),
+        }
+    )
 
 
 def _cfg(**over):
     cfg = {
+        "data_mode": "synthetic_demo",
         "subject_column": "subject_id",
         "label_column": "label",
         "aggregate_to_subject": None,
-        "exclude_columns": ["record_id"],
-        "feature_columns": None,
         "seed": 0,
-        "cv": {"max_splits": 3, "min_subjects_per_class_per_fold": 2},
-        "feature_selection": {"method": "mutual_info", "k": 2},
-        "conditions": ["real_only", "smote"],
-        "models": ["random_forest"],
-        "smote": {"k_neighbors": 3, "min_minority_subjects": 4},
+        "feature_sets": {"ECG Only": ECG, "Physiology Only": PHYS, "Combined": ECG + PHYS},
+        "cv": {"strategy": "group_kfold", "max_splits": 3, "min_subjects_per_class_per_fold": 2},
+        "synthesis": {"method": "class_conditional_gaussian", "target_counts": {0: 80, 1: 70}},
+        "feature_selection": {"method": "mutual_info", "fallback_k": 2},
+        "conditions": ["study_synthesis", "real_only"],
+        "models": ["random_forest", "baseline"],
+        "ensemble": {"enabled": True, "weights": [0.7, 0.3]},
     }
     cfg.update(over)
     return cfg
 
 
-class Recorder(BaseEstimator, TransformerMixin):
-    """Pass-through step that logs which rows it was fitted on and asked to transform."""
+def test_synthesizer_only_ever_sees_training_participants():
+    df = _table()
+    X, y, groups = prepare_table(df, _cfg())
+    fitted_on: list[set] = []
 
-    log: list = []
+    class Spy:
+        def __init__(self, *args, **kwargs):
+            self.inner = make_synthesizer(*args, **kwargs)
 
-    def fit(self, X, y=None):
-        Recorder.log.append(("fit", set(np.asarray(X)[:, 0].round(9))))
-        return self
+        def fit(self, X_tr, y_tr):
+            fitted_on.append({tuple(r) for r in X_tr.round(9).to_numpy()})
+            self.inner.fit(X_tr, y_tr)
+            return self
 
-    def transform(self, X):
-        Recorder.log.append(("transform", set(np.asarray(X)[:, 0].round(9))))
-        return X
+        def sample(self, counts):
+            return self.inner.sample(counts)
 
-
-def test_no_participant_in_both_train_and_test():
-    df = _toy()
-    X, y, groups = prepare_xy(df, _cfg())
-    res = run_experiment(X, y, groups, _cfg(conditions=["real_only"]))
-    # Each participant contributes all 3 records to exactly one test fold.
-    per_fold = res["per_fold"]
-    assert per_fold["n_test_participants"].sum() == 30
-    assert (per_fold["n_test_pos"] + per_fold["n_test_neg"]).sum() == 90
-
-
-def test_preprocessing_selection_and_smote_fit_on_training_rows_only():
-    df = _toy()
-    X, y, groups = prepare_xy(df, _cfg())
-    X = X.copy()
-    X.insert(0, "tag", np.arange(len(X), dtype=float))  # unique per row
-    Recorder.log = []
-
-    def factory(*args):
-        inner = make_pipeline(*args)
-        return Pipeline([("rec", Recorder()), *inner.steps])
-
-    run_experiment(X, y, groups, _cfg(), pipeline_factory=factory)
-    # Log alternates: fit+transform on train (fit_transform) then transform on test.
-    fits = [rows for kind, rows in Recorder.log if kind == "fit"]
-    transforms = [rows for kind, rows in Recorder.log if kind == "transform"]
-    test_sets = [t for t in transforms if t not in fits]
-    assert len(fits) == len(test_sets) == 6  # 3 folds x 2 conditions
-    for train_rows, test_rows in zip(fits, test_sets, strict=True):
-        assert train_rows.isdisjoint(test_rows)
-        train_subj = {groups[int(i)] for i in train_rows}
-        test_subj = {groups[int(i)] for i in test_rows}
-        assert train_subj.isdisjoint(test_subj)
+    res = run_experiment(X, y, groups, _cfg(), synthesizer_factory=Spy)
+    _, folds = make_splits(y, groups, _cfg()["cv"], 0)
+    assert len(fitted_on) == len(folds)
+    for seen, (tr, te) in zip(fitted_on, folds, strict=True):
+        test_rows = {tuple(r) for r in X.iloc[te].round(9).to_numpy()}
+        assert seen.isdisjoint(test_rows)
+        assert len(seen) == len(tr)
+    assert (res["oof"].query("condition == 'study_synthesis'")["n_synthetic_train_rows"] > 0).all()
 
 
-def test_smote_adds_training_rows_but_test_counts_stay_real():
-    df = _toy()
-    cfg = _cfg(aggregate_to_subject="median")
-    X, y, groups = prepare_xy(df, cfg)
+def test_every_prediction_is_for_a_real_held_out_participant():
+    df = _table()
+    X, y, groups = prepare_table(df, _cfg())
+    oof = run_experiment(X, y, groups, _cfg())["oof"]
+    one = oof.query(
+        "condition == 'study_synthesis' and model == 'random_forest' and feature_set == 'Combined'"
+    )
+    assert sorted(one["row"]) == list(range(len(df)))  # each real participant tested exactly once
+    assert (one["y_true"].to_numpy() == y[one["row"].to_numpy()]).all()
+
+
+def test_leave_one_subject_out_tests_each_person_once():
+    df = _table(n_subj=12, n_pos=5)
+    X, y, groups = prepare_table(df, _cfg())
+    strategy, folds = make_splits(y, groups, {"strategy": "loso"}, 0)
+    assert strategy == "leave-one-subject-out" and len(folds) == 12
+    assert all(len(te) == 1 for _, te in folds)
+
+
+def test_auto_strategy_uses_loso_for_small_cohorts():
+    df = _table()
+    X, y, groups = prepare_table(df, _cfg())
+    strategy, _ = make_splits(y, groups, {"strategy": "auto", "loso_max_participants": 60}, 0)
+    assert strategy == "leave-one-subject-out"
+
+
+def test_feature_selection_runs_per_fold_and_is_recorded():
+    df = _table()
+    X, y, groups = prepare_table(df, _cfg())
+    freq = run_experiment(X, y, groups, _cfg())["selection_frequency"]
+    assert set(freq["feature_set"]) == {"ECG Only", "Physiology Only", "Combined"}
+    assert freq["share"].between(0, 1).all()
+
+
+def test_ensemble_is_evaluated_and_combines_both_groups():
+    df = _table()
+    X, y, groups = prepare_table(df, _cfg())
+    res = run_experiment(X, y, groups, _cfg())
+    assert "ensemble" in set(res["summary"]["model"])
+    model = WeightedSoftVote(ECG, PHYS, (0.7, 0.3), seed=0).fit(X, y)
+    p = model.predict_proba(X)[:, 1]
+    p_ecg = model.ecg_model_.predict_proba(X[ECG])[:, 1]
+    p_phys = model.physio_model_.predict_proba(X[PHYS])[:, 1]
+    np.testing.assert_allclose(p, 0.7 * p_ecg + 0.3 * p_phys)
+
+
+def test_ensemble_rejects_weights_that_do_not_sum_to_one():
+    X, y, _ = prepare_table(_table(), _cfg())
+    with pytest.raises(ValueError, match="sum to 1"):
+        WeightedSoftVote(ECG, PHYS, (0.5, 0.2)).fit(X, y)
+
+
+def test_too_few_real_participants_in_a_class_skips_synthesis_with_warning():
+    df = _table()
+    X, y, groups = prepare_table(df, _cfg())
+    cfg = _cfg(synthesis={"target_counts": {0: 80, 1: 70}, "min_real_per_class": 50})
     res = run_experiment(X, y, groups, cfg)
-    pf = res["per_fold"]
-    smote = pf[pf["condition"] == "smote"]
-    assert (smote["n_synthetic_train_rows"] > 0).all()
-    assert (pf["n_test_pos"] + pf["n_test_neg"] == pf["n_test_participants"]).all()
-    assert (pf.loc[pf["condition"] == "real_only", "n_synthetic_train_rows"] == 0).all()
+    assert any("no synthesis" in w for w in res["warnings"])
 
 
-def test_smote_skipped_with_too_few_minority_participants():
+def test_unknown_condition_is_rejected():
+    X, y, groups = prepare_table(_table(), _cfg())
+    with pytest.raises(ValueError, match="Unknown conditions"):
+        run_experiment(X, y, groups, _cfg(conditions=["magic"]))
+
+
+def test_missing_configured_feature_is_an_error():
+    with pytest.raises(ValueError, match="lacks configured features"):
+        prepare_table(_table().drop(columns=["BMI"]), _cfg())
+
+
+def test_smote_baseline_skipped_with_too_few_minority_participants():
     decision = make_balancer(n_minority_train=3, k_neighbors=3, min_minority=4, seed=0)
     assert decision.sampler is None and "skipped" in decision.skipped_reason
-    assert make_balancer(5, 10, 4, 0).sampler.k_neighbors == 4
 
 
 def test_tiny_cohort_is_not_estimable():
-    y = np.array([1, 1, 0, 0, 0, 0])
-    groups = np.array(list("abcdef"))
+    y = np.array([1, 0, 0, 0])
     with pytest.raises(NotEstimableError):
-        choose_n_splits(y, groups, max_splits=5, min_per_fold=2)
-
-
-def test_folds_limited_by_minority_participants_not_rows():
-    y = np.array([1] * 6 + [0] * 30)
-    groups = np.repeat(np.arange(12), 3)  # 2 positive participants with 3 rows each
-    with pytest.raises(NotEstimableError):
-        choose_n_splits(y, groups, max_splits=5, min_per_fold=2)
+        make_splits(y, np.array(list("abcd")), {"strategy": "loso"}, 0)
 
 
 def test_single_class_fold_gives_nan_auc():
@@ -137,7 +170,5 @@ def test_no_positive_predictions_gives_nan_ppv():
 
 
 def test_identifiers_never_become_predictors():
-    df = _toy()
-    df["record_number"] = range(len(df))
-    X, _, _ = prepare_xy(df, _cfg(exclude_columns=["record_id", "record_number"]))
-    assert {"subject_id", "label", "record_number"}.isdisjoint(X.columns)
+    X, _, _ = prepare_table(_table(), _cfg())
+    assert {"subject_id", "label"}.isdisjoint(X.columns)

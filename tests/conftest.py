@@ -42,4 +42,9 @@ def exp_cfg(tmp_path):
     cfg["features_path"] = str(tmp_path / "features.csv")
     cfg["output_dir"] = str(tmp_path / "runs")
     cfg["cv"]["max_splits"] = 3
+    # A lighter run of the same pipeline: fewer conditions and models, no CTGAN or Boruta.
+    cfg["conditions"] = ["study_synthesis", "real_only"]
+    cfg["models"] = ["random_forest", "baseline"]
+    cfg["feature_selection"] = {"method": "mutual_info", "fallback_k": 3}
+    cfg["synthesis"]["compare_methods"] = ["class_conditional_gaussian"]
     return cfg

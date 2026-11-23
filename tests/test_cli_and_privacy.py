@@ -32,13 +32,26 @@ def test_missing_study_file_errors_without_demo_fallback(tmp_path, capsys):
 def test_end_to_end_reports_contain_no_ids_or_rows(data_cfg, exp_cfg):
     qc = cmd_extract(data_cfg)
     out = Path(cmd_train(exp_cfg, qc))
-    for name in ("metadata.json", "per_fold.csv", "summary.csv", "report.md"):
-        text = (out / name).read_text()
-        assert "SYN0" not in text
+    text_files = [p for p in out.iterdir() if p.suffix in {".csv", ".json", ".md"}]
+    assert {"metadata.json", "summary.csv", "report.md", "folds.csv"} <= {
+        p.name for p in text_files
+    }
+    for path in text_files:
+        assert "SYN0" not in path.read_text(), path.name
     meta = json.loads((out / "metadata.json").read_text())
     assert meta["data_mode"] == "synthetic_demo"
     assert "SYNTHETIC DEMO" in meta["caveat"]
     assert "SYN0" not in Path(data_cfg["output"]["qc_report_path"]).read_text()
+    assert (out / "ensemble_demo_only.joblib").exists()
+
+
+def test_ensemble_is_never_saved_for_study_data(data_cfg, exp_cfg):
+    cmd_extract(data_cfg)
+    exp_cfg["data_mode"] = "study"
+    exp_cfg["analysis"] = {"enabled": False}
+    out = Path(cmd_train(exp_cfg))
+    assert not list(out.glob("*.joblib"))
+    assert "SYNTHETIC DEMO" not in (out / "report.md").read_text()
 
 
 def test_private_paths_are_git_ignored():
