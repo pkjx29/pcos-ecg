@@ -27,7 +27,11 @@ labels:
 covariates:                         # optional, NOT derived from ECG
   path: null                        # e.g. data/private/covariates.csv
   subject_id: subject_id
-  columns: []                       # e.g. [BMI, Cycle_Length]
+  columns: [Cycle_Length, Cycle_Regularity, BMI, Family_History]   # the study's four
+                                    # Cycle_Regularity: Regular/Irregular; Family_History: Yes/No
+
+signal:
+  backend: neurokit2                # neurokit2 (wavelet delineation) or scipy (no P-wave spread)
 
 preprocessing:
   bandpass_hz: [0.5, 40.0]          # validated against Nyquist at load time

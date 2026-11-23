@@ -1,31 +1,57 @@
-# Model comparison settings. Copy to configs/local_experiment.yaml (git-ignored) for study data.
+# Model comparison for STUDY data, following the original study's method with leakage fixed.
+# Copy to configs/local_experiment.yaml (git-ignored) and edit.
 
 data_mode: study
-features_path: data/private/features.csv
-label_column: label                 # 1 = positive (PCOS), 0 = control
+features_path: data/private/features.csv   # written by extract-features: one row per participant
+label_column: label                        # 1 = PCOS, 0 = normal
 subject_column: subject_id
-aggregate_to_subject: median        # one row per participant before modelling; null to keep records
-exclude_columns: [record_id, n_beats, quality_ok]   # never used as predictors
-feature_columns: null               # null = every remaining numeric column
-
+aggregate_to_subject: null                 # set to median if the table has several rows per person
 seed: 42
 
+# The study's final 10 features (report Table 3.5.5b). Names "ECG Only" and
+# "Physiology Only" are used by the ensemble.
+feature_sets:
+  ECG Only: [HRV_SDNN_Estimate, P_Wave_Dispersion, SDNN_MeanRR_Ratio, QTc_Bazett, PR_Interval, T_Wave_Duration]
+  Physiology Only: [Cycle_Length, Cycle_Regularity, BMI, Family_History]
+  Combined: [HRV_SDNN_Estimate, P_Wave_Dispersion, SDNN_MeanRR_Ratio, QTc_Bazett, PR_Interval, T_Wave_Duration,
+             Cycle_Length, Cycle_Regularity, BMI, Family_History]
+
 cv:
-  max_splits: 5                     # reduced automatically to what the minority class supports
+  strategy: loso                    # leave-one-subject-out: each real participant is tested once
+  loso_max_participants: 60         # used when strategy is auto
+  max_splits: 5                     # group_kfold only
   min_subjects_per_class_per_fold: 2
 
-feature_selection:
-  method: mutual_info               # mutual_info | none ; fitted inside each training fold
-  k: 8
+# Synthetic expansion, as in the study's 03_2, but fitted on each fold's training
+# participants only. Rows are added until the training set reaches target_counts.
+synthesis:
+  method: class_conditional_gaussian    # class_conditional_gaussian | gaussian_copula | ctgan
+  target_counts: {0: 80, 1: 70}         # the study's 150 rows: 80 normal, 70 PCOS
+  min_real_per_class: 3                 # below this, the fold trains on real rows only (flagged)
+  compare_methods: [class_conditional_gaussian, gaussian_copula, ctgan]   # 03_1 comparison
+  compare_rows: 150
+  ctgan_epochs: 300
 
-# real_only    : no rebalancing
-# class_weight : cost-sensitive learning (NOT synthetic data)
-# smote        : SMOTE synthetic minority rows, generated from the training fold only
-conditions: [real_only, class_weight, smote]
-models: [baseline, random_forest, svm, xgboost]
+# The study's 03_3, run inside each training fold.
+feature_selection:
+  method: study                     # study (corr -> MI -> Boruta) | mutual_info | none
+  corr_threshold: 0.90
+  boruta_max_iter: 50
+  fallback_k: 4                     # if Boruta keeps nothing: top-k by mutual information
+
+# study_synthesis is the study's method; the others are labelled baselines.
+conditions: [study_synthesis, real_only, class_weight, smote]
+models: [random_forest, xgboost, svm, baseline]   # 3 models x 3 feature sets = the study's 9
 
 smote:
   k_neighbors: 3
-  min_minority_subjects: 4          # below this, SMOTE is skipped for the fold and flagged
+  min_minority_subjects: 4
+
+ensemble:
+  enabled: true                     # 0.7 ECG / 0.3 physiology soft vote (03_3 step 4)
+  weights: [0.7, 0.3]               # evaluated in CV; never saved for study data
+
+analysis:
+  enabled: true                     # SHAP, Mann-Whitney U, PCA/t-SNE/UMAP, calibration, decision and learning curves
 
 output_dir: runs

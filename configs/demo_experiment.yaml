@@ -1,28 +1,50 @@
 # SYNTHETIC DEMO ONLY. Metrics from this config describe the toy generator, not PCOS.
+# Same method as experiment.example.yaml, with settings chosen to run in a few minutes.
 
 data_mode: synthetic_demo
 features_path: data/demo/features.csv
 label_column: label
 subject_column: subject_id
-aggregate_to_subject: median
-exclude_columns: [record_id, n_beats, quality_ok]
-feature_columns: null
-
+aggregate_to_subject: null
 seed: 42
 
+feature_sets:
+  ECG Only: [HRV_SDNN_Estimate, P_Wave_Dispersion, SDNN_MeanRR_Ratio, QTc_Bazett, PR_Interval, T_Wave_Duration]
+  Physiology Only: [Cycle_Length, Cycle_Regularity, BMI, Family_History]
+  Combined: [HRV_SDNN_Estimate, P_Wave_Dispersion, SDNN_MeanRR_Ratio, QTc_Bazett, PR_Interval, T_Wave_Duration,
+             Cycle_Length, Cycle_Regularity, BMI, Family_History]
+
 cv:
+  strategy: group_kfold             # 5 folds keep the demo fast; study data uses loso
   max_splits: 5
   min_subjects_per_class_per_fold: 2
 
-feature_selection:
-  method: mutual_info
-  k: 8
+synthesis:
+  method: class_conditional_gaussian
+  target_counts: {0: 80, 1: 70}
+  min_real_per_class: 3
+  compare_methods: [class_conditional_gaussian, gaussian_copula, ctgan]
+  compare_rows: 150
+  ctgan_epochs: 100
 
-conditions: [real_only, class_weight, smote]
-models: [baseline, random_forest, svm, xgboost]
+feature_selection:
+  method: study
+  corr_threshold: 0.90
+  boruta_max_iter: 30
+  fallback_k: 4
+
+conditions: [study_synthesis, real_only, class_weight, smote]
+models: [random_forest, xgboost, svm, baseline]
 
 smote:
   k_neighbors: 3
   min_minority_subjects: 4
+
+ensemble:
+  enabled: true
+  weights: [0.7, 0.3]
+
+analysis:
+  enabled: true
 
 output_dir: runs

@@ -13,8 +13,9 @@ import warnings
 import pandas as pd
 
 from pcos_ecg.config import ConfigError, load_config, resolve
-from pcos_ecg.evaluation.cv import NotEstimableError, prepare_xy, run_experiment
+from pcos_ecg.evaluation.cv import NotEstimableError, prepare_table, run_experiment
 from pcos_ecg.features.build import build_feature_table
+from pcos_ecg.features.study import BINARY_CODES, participant_table
 from pcos_ecg.ingestion.load import (
     DataValidationError,
     load_covariates,
@@ -22,7 +23,7 @@ from pcos_ecg.ingestion.load import (
     load_waveforms,
 )
 from pcos_ecg.ingestion.validate import validate_cohort, validate_waveforms
-from pcos_ecg.reporting.report import write_report
+from pcos_ecg.reporting.report import new_run_dir, write_report
 from pcos_ecg.signal.preprocess import FilterConfigError
 
 DEMO_DATA_CFG = "configs/demo_data.yaml"
@@ -46,7 +47,8 @@ def cmd_extract(data_cfg: dict) -> dict:
     labels = load_labels(data_cfg)
     validate_waveforms(waves)
     validate_cohort(labels, waves["subject_id"])
-    table, qc = build_feature_table(waves, labels, data_cfg, load_covariates(data_cfg))
+    records, qc = build_feature_table(waves, data_cfg)
+    table = participant_table(records, labels, load_covariates(data_cfg))
 
     out = resolve(data_cfg["output"]["features_path"])
     out.parent.mkdir(parents=True, exist_ok=True)
@@ -54,24 +56,92 @@ def cmd_extract(data_cfg: dict) -> dict:
     resolve(data_cfg["output"]["qc_report_path"]).write_text(json.dumps(qc, indent=2))
     print(
         f"Features for {qc['n_records_quality_ok']}/{qc['n_records']} records "
-        f"({qc['n_subjects']} participants) written to {out}"
+        f"({len(table)} participants, {qc['signal_backend']} backend) written to {out}"
     )
     return qc
 
 
-def cmd_train(exp_cfg: dict, qc: dict | None = None) -> str:
+def _load_table(exp_cfg: dict):
     path = resolve(exp_cfg["features_path"])
     if not path.exists():
         raise DataValidationError(f"Feature table not found at {path}; run extract-features first")
-    X, y, groups = prepare_xy(pd.read_csv(path), exp_cfg)
+    return prepare_table(pd.read_csv(path), exp_cfg)
+
+
+def _compare(X, y, exp_cfg: dict) -> pd.DataFrame | None:
+    s = exp_cfg.get("synthesis") or {}
+    methods = s.get("compare_methods")
+    if not methods:
+        return None
+    from pcos_ecg.synthesis.compare import compare_synthesizers
+
+    return compare_synthesizers(
+        X,
+        y,
+        methods,
+        n_rows=s.get("compare_rows", 150),
+        categorical=[c for c in BINARY_CODES if c in X.columns],
+        seed=int(exp_cfg["seed"]),
+        epochs=s.get("ctgan_epochs", 300),
+    )
+
+
+def cmd_compare(exp_cfg: dict) -> str:
+    X, y, _ = _load_table(exp_cfg)
+    table = _compare(X, y, exp_cfg)
+    if table is None:
+        raise ConfigError("set synthesis.compare_methods in the experiment config")
+    out = new_run_dir(exp_cfg)
+    table.to_csv(out / "synthesizer_comparison.csv", index=False)
+    print(table.round(4).to_string(index=False))
+    print(f"Written to {out}")
+    return str(out)
+
+
+def cmd_train(exp_cfg: dict, qc: dict | None = None) -> str:
+    X, y, groups = _load_table(exp_cfg)
     with warnings.catch_warnings():
-        # Undefined-metric warnings are expected on tiny folds; they are reported as NaN.
+        # Undefined-metric warnings are expected on small folds; they are reported as NaN.
         warnings.simplefilter("ignore", category=UserWarning)
         result = run_experiment(X, y, groups, exp_cfg)
-    out = write_report(result, exp_cfg, qc)
+        synth = _compare(X, y, exp_cfg)
+    out = new_run_dir(exp_cfg)
+    notes = []
+    if (exp_cfg.get("analysis") or {}).get("enabled", True):
+        from pcos_ecg.analysis.outputs import write_analysis
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            notes = write_analysis(out, X, y, result, exp_cfg)
+    if exp_cfg["data_mode"] == "synthetic_demo" and (exp_cfg.get("ensemble") or {}).get("enabled"):
+        notes.append(_save_demo_ensemble(out, X, y, exp_cfg))
+    write_report(out, result, exp_cfg, qc, synth, notes)
     print((out / "report.md").read_text())
     print(f"Report written to {out}")
     return str(out)
+
+
+def _save_demo_ensemble(out, X, y, exp_cfg: dict) -> str:
+    """Fit the 0.7/0.3 ensemble on all demo data and save it. Never done for study data."""
+    import joblib
+
+    from pcos_ecg.features.selection import select_features
+    from pcos_ecg.features.study import feature_sets
+    from pcos_ecg.models.ensemble import WeightedSoftVote
+
+    sets, fs = feature_sets(exp_cfg), exp_cfg.get("feature_selection") or {}
+    pick = {
+        name: select_features(
+            X[sets[name]], y, method=fs.get("method", "study"), seed=int(exp_cfg["seed"])
+        ).selected
+        for name in ("ECG Only", "Physiology Only")
+    }
+    weights = tuple((exp_cfg.get("ensemble") or {}).get("weights", (0.7, 0.3)))
+    model = WeightedSoftVote(
+        pick["ECG Only"], pick["Physiology Only"], weights, int(exp_cfg["seed"])
+    )
+    joblib.dump(model.fit(X, y), out / "ensemble_demo_only.joblib")
+    return "ensemble_demo_only.joblib: fitted on synthetic demo data only; not a PCOS model"
 
 
 def cmd_demo(n_subjects: int, n_positive: int, seed: int) -> str:
@@ -103,8 +173,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     for name, helptext in [
         ("validate-data", "check schema, sampling rates and labels (counts only)"),
-        ("extract-features", "quality-check, filter and extract ECG features"),
-        ("train-evaluate", "participant-grouped CV comparison of RF / SVM / XGBoost"),
+        ("extract-features", "quality-check recordings and build the participant feature table"),
+        ("compare-synthesizers", "score the study's synthesizers as in its 03_1 notebook"),
+        (
+            "train-evaluate",
+            "leakage-safe comparison of RF / XGBoost / SVM on held-out participants",
+        ),
     ]:
         s = sub.add_parser(name, help=helptext)
         s.add_argument("--config", required=True, help="path to a YAML config")
@@ -120,6 +194,8 @@ def main(argv: list[str] | None = None) -> int:
             cmd_validate(load_config(args.config))
         elif args.command == "extract-features":
             cmd_extract(load_config(args.config))
+        elif args.command == "compare-synthesizers":
+            cmd_compare(load_config(args.config))
         elif args.command == "train-evaluate":
             cmd_train(load_config(args.config))
     except (ConfigError, DataValidationError, FilterConfigError, NotEstimableError) as exc:

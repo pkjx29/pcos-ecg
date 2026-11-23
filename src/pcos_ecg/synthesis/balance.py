@@ -1,14 +1,11 @@
-"""Synthetic class balancing.
+"""SMOTE, kept as a labelled baseline.
 
-Method: SMOTE (Chawla et al. 2002, JAIR 16:321) from imbalanced-learn. It creates new
-minority rows by interpolating between a minority row and one of its k nearest minority
-neighbours. It sits inside an imblearn Pipeline, which applies samplers during fit()
-only, so within cross-validation it only ever sees the training fold. Synthetic rows
-are not extra volunteers: participant counts in reports always refer to real people.
-
-A Bayesian-network or copula synthesizer (e.g. SDV) is not used: it is not installed in
-the reference environment, and SMOTE is the method this project's brief describes as
-"synthetic class balancing". The `make_balancer` interface allows swapping it later.
+The study's own approach is synthetic expansion with the generators in generators.py. SMOTE
+(Chawla et al. 2002, JAIR 16:321) is offered only for comparison: it creates minority rows
+by interpolating between a minority row and one of its k nearest minority neighbours. It sits
+inside an imblearn Pipeline, which applies samplers during fit() only, so within
+cross-validation it only ever sees the training fold. Synthetic rows are not extra
+volunteers: participant counts in reports always refer to real people.
 """
 
 from __future__ import annotations

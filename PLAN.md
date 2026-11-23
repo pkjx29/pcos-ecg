@@ -6,7 +6,7 @@ Status of each phase. A box is ticked only after its checks ran and passed.
 - [x] **1. Scaffold**: package, configs, `.gitignore`, CLI `--help`.
 - [x] **2. Data contracts**: waveform + label loaders, schema/cohort validation, privacy-safe QC report.
 - [x] **3. Signal + features**: quality checks, zero-phase filtering, R-peak detection, interval/HRV features with failure reasons.
-- [x] **4. Balancing**: SMOTE inside training folds only; class-weight comparator; minimum-data guard.
+- [x] **4. Synthesis**: the study's class-conditional Gaussian (plus SDV Gaussian Copula / CTGAN) on training participants only; SMOTE and class weights as baselines.
 - [x] **5. Evaluation**: participant-grouped stratified CV, RF / SVM / XGBoost / baseline, fold-local selection, reports.
 - [x] **6. App**: Streamlit dashboard reading only produced reports; demo mode labelled.
 - [x] **7. Tests + CI**: pytest and ruff pass locally; GitHub Actions workflow written (runs after first push).

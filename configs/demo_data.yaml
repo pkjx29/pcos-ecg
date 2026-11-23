@@ -23,10 +23,13 @@ labels:
   label_level: participant
   label_source: synthetic generator (no clinical meaning)
 
-covariates:
-  path: null
+covariates:                         # the study's physiological features (synthetic here)
+  path: data/demo/covariates.csv
   subject_id: subject_id
-  columns: []
+  columns: [Cycle_Length, Cycle_Regularity, BMI, Family_History]
+
+signal:
+  backend: neurokit2                # neurokit2 (needs the 'study' extra) or scipy
 
 preprocessing:
   bandpass_hz: [0.5, 40.0]

@@ -35,47 +35,56 @@ reproduce them. See [`docs/claims_ledger.md`](docs/claims_ledger.md).
 
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -e ".[dev]"
-pcos-ecg demo              # synthetic cohort → features → model comparison report
-pytest                     # 39 tests, synthetic data only
+pip install torch --index-url https://download.pytorch.org/whl/cpu   # CPU-only PyTorch, needed by SDV
+pip install -e ".[dev,study]"
+pcos-ecg demo              # synthetic cohort -> features -> study-method evaluation (about 1-2 min)
+pytest                     # 73 tests, synthetic data only
 streamlit run app/Home.py  # dashboard
 ```
 
-`pcos-ecg demo` generates 30 made-up participants, the same size as the pilot (an arbitrary 10 in the positive class, two 30 s
-recordings each at 250 Hz), extracts features and writes a report to `runs/`. The class
-difference in the generator is arbitrary, so **the demo metrics say nothing about PCOS**.
+The `study` extra adds SDV, SDMetrics, Boruta, NeuroKit2, UMAP and SHAP. Without it the
+core package still installs, and the tests that need those libraries are skipped.
 
-## Pipeline
+`pcos-ecg demo` generates 30 made-up participants, the same size as the pilot (an
+arbitrary 10 in the positive class, two 30 s recordings each at 250 Hz, plus made-up cycle
+length, cycle regularity, BMI and family history). It extracts features, compares the
+synthesizers, evaluates every model and writes a report to `runs/`. The class differences
+in the generator are arbitrary, so **the demo metrics say nothing about PCOS**.
+
+## Pipeline: the original study's method, evaluated without leakage
 
 ```mermaid
 flowchart LR
-    A[Single-lead ECG] --> B[Quality checks]
-    B --> C[Band-pass 0.5–40 Hz<br/>+ 50 Hz notch]
-    C --> D[R-peak detection]
-    D --> E[HRV + interval features<br/>median beat]
-    E --> F[Per-participant table]
-    F --> G[Grouped stratified CV]
-    G --> H["Per fold: impute → scale →<br/>select k best → SMOTE → model"]
-    H --> I[Report]
+    A[Kardia single-lead ECG] --> B[NeuroKit2: clean,<br/>R peaks, delineation]
+    B --> C[Study features + 4 engineered]
+    P[Cycle length, regularity,<br/>BMI, family history] --> D
+    C --> D[One row per participant]
+    D --> E[Split real participants<br/>LOSO or grouped k-fold]
+    E --> F["Training fold only:<br/>synthetic expansion to 80/70 →<br/>corr → MI → Boruta"]
+    F --> G[RF / XGBoost / SVM × 3 feature sets<br/>+ 0.7/0.3 ensemble]
+    G --> H[Score held-out real participants]
+    H --> I[Report, SHAP, curves]
 ```
 
-1. **Quality checks**: reject empty, short, non-finite, out-of-range, saturated or flat
-   recordings, with the reason recorded.
-2. **Filtering**: 4th-order Butterworth band-pass and a 50 Hz notch, applied forward and
-   backward (zero phase). This is offline processing; a wearable would need a causal filter.
-3. **R peaks**: simplified Pan–Tompkins (5–15 Hz band, derivative, squaring, 150 ms
-   integration, 250 ms refractory period), then RR cleaning.
-4. **Features**: heart rate, SDNN, RMSSD, SDNN/mean RR, and PR, QRS, QT, QTc (Bazett) and
-   T-wave duration from a median beat. A feature that cannot be measured is left empty
-   with a reason; it is never filled with a guess. P-wave dispersion needs several leads
-   and is not computed.
-5. **Evaluation**: participants, not recordings, are the unit. `StratifiedGroupKFold`
-   keeps each person in one fold. Imputation, scaling, mutual-information feature
-   selection and SMOTE are all fitted inside each training fold, so test folds contain
-   only real, unseen participants. Each model runs under three conditions: no
-   balancing, class weights, and SMOTE.
-6. **Report**: sensitivity, specificity, PPV, F1, balanced accuracy, ROC-AUC and PR-AUC
-   per fold, with mean and SD across folds.
+| Step | Original study (`original_study/03_Code`) | This repository |
+|---|---|---|
+| ECG intervals | Estimated with AI assistance from Kardia printouts; no code | NeuroKit2 cleaning, R peaks and wavelet delineation (`signal/nk_features.py`); the built-in scipy detector remains as an alternative |
+| P-wave dispersion | Reported as a feature | Single-lead proxy: beat-to-beat spread (95th–5th percentile) of P-wave duration, labelled as such |
+| Features | 6 ECG + 4 physiological, plus SDNN/MeanRR, QTc/MeanRR, PWD×QTc, SDNN×QTc | Same names and formulas (`features/study.py`) |
+| Synthesizer choice | CTGAN vs Gaussian Copula vs Bayesian network, scored with SDMetrics (`03_1`) | Same comparison (`pcos-ecg compare-synthesizers`) |
+| 30 → 150 expansion | Called a Bayesian network; actually a class-conditional Gaussian (`03_2`) | Same method, named honestly, with exact 80/70 class sizes and values clipped to the training range |
+| Where synthesis happens | On all participants before splitting | **Changed:** on each fold's training participants only |
+| Feature selection | Correlation → mutual information → Boruta on the whole dataset | Same three stages, **changed** to run inside each fold |
+| Evaluation | Trained and tested on synthetic rows; 80:20 split and 5-fold CV | **Changed:** every test prediction is for a real, held-out participant; leave-one-subject-out for study data |
+| Models | RF, XGBoost, SVM × ECG / physiology / combined (9 experiments) | Same 9, plus a prior-only baseline |
+| Ensemble | 0.7 ECG / 0.3 physiology soft vote | Same, evaluated in CV; saved only from demo data |
+| Analysis | SHAP, Mann-Whitney U, PCA/t-SNE/UMAP, calibration, decision and learning curves | Same, written to `runs/` |
+| Baselines | – | Real data only, class weights, and SMOTE on training participants, all labelled as baselines |
+
+The changes matter: in the original setup the test rows were synthetic copies of the same
+people the model trained on, which inflates the scores. Here a score can only come from
+predicting someone the model never saw. With about 30 real participants, expect much
+lower and less stable numbers than the paper's.
 
 Details: [`docs/architecture.md`](docs/architecture.md),
 [`docs/data_dictionary.md`](docs/data_dictionary.md).
@@ -89,6 +98,7 @@ cp configs/data_schema.example.yaml configs/local_data.yaml        # edit column
 cp configs/experiment.example.yaml  configs/local_experiment.yaml
 pcos-ecg validate-data    --config configs/local_data.yaml
 pcos-ecg extract-features --config configs/local_data.yaml
+pcos-ecg compare-synthesizers --config configs/local_experiment.yaml   # optional: the 03_1 comparison
 pcos-ecg train-evaluate   --config configs/local_experiment.yaml
 ```
 
@@ -132,7 +142,8 @@ inference attack to test what the privacy budget protects in practice.
 ## Repository layout
 
 ```
-src/pcos_ecg/   ingestion/ signal/ features/ synthesis/ models/ evaluation/ reporting/ demo/ cli.py
+src/pcos_ecg/   ingestion/ signal/ features/ synthesis/ models/ evaluation/ analysis/ reporting/ demo/ cli.py
+original_study/ the team's original notebooks and aggregate results
 app/Home.py     Streamlit dashboard (demo-safe; no individual predictions)
 configs/        example and demo configs (no private paths)
 tests/          pytest suite on synthetic data
@@ -145,8 +156,10 @@ docs/           architecture, data dictionary, protocol template, model card, de
 - With 30 participants, cross-validated scores are unstable, and internal CV is not
   external validation.
 - Morphology features are automatic single-lead estimates, not expert annotations.
-- SMOTE interpolates between participants in feature space; the synthetic rows are not
-  extra volunteers.
+- Synthetic rows, however they are made, are not extra volunteers: the effective sample
+  size is the number of real participants.
+- P-wave dispersion cannot be measured from one lead; the single-lead proxy is a different
+  quantity.
 - Bazett's QTc correction is biased at high heart rates.
 
 ## License
