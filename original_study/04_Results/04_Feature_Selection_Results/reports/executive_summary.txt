@@ -1,0 +1,12 @@
+
+EXECUTIVE SUMMARY
+-----------------
+Top ECG Biomarkers: num__HRV_SDNN_Estimate (ms), num__P_Wave_Dispersion (s), num__SDNN_MeanRR_Ratio
+Top Phys Biomarkers: num__Cycle Length, num__BMI, cat__Cycle Regularity, cat__Family History (PCOS/Diabetes)
+
+ECG-only AUC: 0.877
+Phys-only AUC: 0.707
+Combined AUC: 0.884
+Weighted Ensemble AUC: 0.876
+
+Conclusion: READY FOR MODEL TRAINING

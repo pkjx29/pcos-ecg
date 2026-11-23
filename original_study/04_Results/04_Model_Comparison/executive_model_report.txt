@@ -1,0 +1,26 @@
+ECG-CENTRIC PCOS SCREENING SYSTEM - EXECUTIVE MODEL REPORT
+Generated: 2026-06-07 20:53:45
+
+1. Best Model
+Random Forest
+
+2. Best Feature Set
+ECG Only
+
+3. ROC-AUC
+0.922 ± 0.077
+
+4. PR-AUC
+0.898 ± 0.106
+
+5. Top Biomarkers
+P_Wave_Dispersion, PR_Interval, HRV_SDNN_Estimate, SDNN_MeanRR_Ratio, T_Wave_Duration
+
+6. Clinical Interpretation
+ECG-derived autonomic and repolarization markers contribute materially to PCOS discrimination. The best-performing screening signal came from the ECG Only feature set.
+
+7. Deployment Recommendation
+Use as a research-grade screening aid only after external validation, calibration assessment, and prospective evaluation against site-specific prevalence and workflow requirements.
+
+Final statement:
+READY FOR EXTERNAL VALIDATION

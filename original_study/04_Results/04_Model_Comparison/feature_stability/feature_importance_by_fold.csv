@@ -1,0 +1,301 @@
+Model,Feature Set,Fold,Feature,Importance
+Random Forest,ECG Only,1,HRV_SDNN_Estimate,0.18403667294952167
+Random Forest,ECG Only,1,P_Wave_Dispersion,0.2632807541055007
+Random Forest,ECG Only,1,SDNN_MeanRR_Ratio,0.13931167280043064
+Random Forest,ECG Only,1,QTc_Bazett,0.09312185615384644
+Random Forest,ECG Only,1,PR_Interval,0.1938349235285719
+Random Forest,ECG Only,1,T_Wave_Duration,0.12641412046212852
+Random Forest,ECG Only,2,HRV_SDNN_Estimate,0.1654217991698186
+Random Forest,ECG Only,2,P_Wave_Dispersion,0.24711216721403947
+Random Forest,ECG Only,2,SDNN_MeanRR_Ratio,0.14944697761663733
+Random Forest,ECG Only,2,QTc_Bazett,0.11486428374667898
+Random Forest,ECG Only,2,PR_Interval,0.20879275066110606
+Random Forest,ECG Only,2,T_Wave_Duration,0.1143620215917194
+Random Forest,ECG Only,3,HRV_SDNN_Estimate,0.17121020344789234
+Random Forest,ECG Only,3,P_Wave_Dispersion,0.3270139922708892
+Random Forest,ECG Only,3,SDNN_MeanRR_Ratio,0.13202590528931618
+Random Forest,ECG Only,3,QTc_Bazett,0.09671962749666722
+Random Forest,ECG Only,3,PR_Interval,0.16174789349392407
+Random Forest,ECG Only,3,T_Wave_Duration,0.11128237800131091
+Random Forest,ECG Only,4,HRV_SDNN_Estimate,0.20123476149118633
+Random Forest,ECG Only,4,P_Wave_Dispersion,0.23537549968420507
+Random Forest,ECG Only,4,SDNN_MeanRR_Ratio,0.1130250729421027
+Random Forest,ECG Only,4,QTc_Bazett,0.05861710204031667
+Random Forest,ECG Only,4,PR_Interval,0.2572946257027813
+Random Forest,ECG Only,4,T_Wave_Duration,0.13445293813940792
+Random Forest,ECG Only,5,HRV_SDNN_Estimate,0.16872300152316455
+Random Forest,ECG Only,5,P_Wave_Dispersion,0.25876734990905603
+Random Forest,ECG Only,5,SDNN_MeanRR_Ratio,0.1688608308810606
+Random Forest,ECG Only,5,QTc_Bazett,0.10902218903504729
+Random Forest,ECG Only,5,PR_Interval,0.17940017677130785
+Random Forest,ECG Only,5,T_Wave_Duration,0.11522645188036366
+XGBoost,ECG Only,1,HRV_SDNN_Estimate,0.14098596467833246
+XGBoost,ECG Only,1,P_Wave_Dispersion,0.5626437026065312
+XGBoost,ECG Only,1,SDNN_MeanRR_Ratio,0.06462056141629396
+XGBoost,ECG Only,1,QTc_Bazett,0.07470159922017455
+XGBoost,ECG Only,1,PR_Interval,0.103219582861516
+XGBoost,ECG Only,1,T_Wave_Duration,0.05382858921715178
+XGBoost,ECG Only,2,HRV_SDNN_Estimate,0.12685741270016931
+XGBoost,ECG Only,2,P_Wave_Dispersion,0.5642129750316974
+XGBoost,ECG Only,2,SDNN_MeanRR_Ratio,0.06396640735526755
+XGBoost,ECG Only,2,QTc_Bazett,0.08225420944714418
+XGBoost,ECG Only,2,PR_Interval,0.11055812606613862
+XGBoost,ECG Only,2,T_Wave_Duration,0.05215086939958287
+XGBoost,ECG Only,3,HRV_SDNN_Estimate,0.08240909506041877
+XGBoost,ECG Only,3,P_Wave_Dispersion,0.6826322965637313
+XGBoost,ECG Only,3,SDNN_MeanRR_Ratio,0.04996021241127495
+XGBoost,ECG Only,3,QTc_Bazett,0.06560845379791615
+XGBoost,ECG Only,3,PR_Interval,0.07583017308279098
+XGBoost,ECG Only,3,T_Wave_Duration,0.04355976908386786
+XGBoost,ECG Only,4,HRV_SDNN_Estimate,0.2789642017322785
+XGBoost,ECG Only,4,P_Wave_Dispersion,0.47128674032372214
+XGBoost,ECG Only,4,SDNN_MeanRR_Ratio,0.03334351020482669
+XGBoost,ECG Only,4,QTc_Bazett,0.044120029217449744
+XGBoost,ECG Only,4,PR_Interval,0.12602753045215057
+XGBoost,ECG Only,4,T_Wave_Duration,0.046257988069572396
+XGBoost,ECG Only,5,HRV_SDNN_Estimate,0.14295059708786378
+XGBoost,ECG Only,5,P_Wave_Dispersion,0.5546039446183284
+XGBoost,ECG Only,5,SDNN_MeanRR_Ratio,0.06887712457919726
+XGBoost,ECG Only,5,QTc_Bazett,0.07850314077927062
+XGBoost,ECG Only,5,PR_Interval,0.11157620906040462
+XGBoost,ECG Only,5,T_Wave_Duration,0.043488983874935355
+SVM (RBF Kernel),ECG Only,1,HRV_SDNN_Estimate,0.1858974358974358
+SVM (RBF Kernel),ECG Only,1,P_Wave_Dispersion,0.12019230769230783
+SVM (RBF Kernel),ECG Only,1,SDNN_MeanRR_Ratio,0.14583333333333334
+SVM (RBF Kernel),ECG Only,1,QTc_Bazett,0.01762820512820517
+SVM (RBF Kernel),ECG Only,1,PR_Interval,0.469551282051282
+SVM (RBF Kernel),ECG Only,1,T_Wave_Duration,0.06089743589743599
+SVM (RBF Kernel),ECG Only,2,HRV_SDNN_Estimate,0.19313304721030033
+SVM (RBF Kernel),ECG Only,2,P_Wave_Dispersion,0.29506437768240346
+SVM (RBF Kernel),ECG Only,2,SDNN_MeanRR_Ratio,0.10085836909871225
+SVM (RBF Kernel),ECG Only,2,QTc_Bazett,0.13304721030042915
+SVM (RBF Kernel),ECG Only,2,PR_Interval,0.2628755364806867
+SVM (RBF Kernel),ECG Only,2,T_Wave_Duration,-0.01502145922746798
+SVM (RBF Kernel),ECG Only,3,HRV_SDNN_Estimate,0.25348189415041783
+SVM (RBF Kernel),ECG Only,3,P_Wave_Dispersion,0.44568245125348166
+SVM (RBF Kernel),ECG Only,3,SDNN_MeanRR_Ratio,0.05292479108635126
+SVM (RBF Kernel),ECG Only,3,QTc_Bazett,0.005571030640668842
+SVM (RBF Kernel),ECG Only,3,PR_Interval,0.22562674094707538
+SVM (RBF Kernel),ECG Only,3,T_Wave_Duration,-0.016713091922005003
+SVM (RBF Kernel),ECG Only,4,HRV_SDNN_Estimate,0.12009237875288674
+SVM (RBF Kernel),ECG Only,4,P_Wave_Dispersion,0.020785219399538108
+SVM (RBF Kernel),ECG Only,4,SDNN_MeanRR_Ratio,0.27482678983833725
+SVM (RBF Kernel),ECG Only,4,QTc_Bazett,0.14318706697459585
+SVM (RBF Kernel),ECG Only,4,PR_Interval,0.2840646651270209
+SVM (RBF Kernel),ECG Only,4,T_Wave_Duration,0.15704387990762128
+SVM (RBF Kernel),ECG Only,5,HRV_SDNN_Estimate,0.16125541125541118
+SVM (RBF Kernel),ECG Only,5,P_Wave_Dispersion,0.26298701298701305
+SVM (RBF Kernel),ECG Only,5,SDNN_MeanRR_Ratio,0.14610389610389607
+SVM (RBF Kernel),ECG Only,5,QTc_Bazett,-0.021645021645021568
+SVM (RBF Kernel),ECG Only,5,PR_Interval,0.3354978354978355
+SVM (RBF Kernel),ECG Only,5,T_Wave_Duration,0.0725108225108226
+Random Forest,Physiology Only,1,Cycle_Length,0.0
+Random Forest,Physiology Only,1,Cycle_Regularity,0.15989017720184442
+Random Forest,Physiology Only,1,BMI,0.8133084991569499
+Random Forest,Physiology Only,1,Family_History,0.026801323641205733
+Random Forest,Physiology Only,2,Cycle_Length,0.0
+Random Forest,Physiology Only,2,Cycle_Regularity,0.11623770434884642
+Random Forest,Physiology Only,2,BMI,0.8532451846445763
+Random Forest,Physiology Only,2,Family_History,0.03051711100657724
+Random Forest,Physiology Only,3,Cycle_Length,0.0
+Random Forest,Physiology Only,3,Cycle_Regularity,0.1746246548308285
+Random Forest,Physiology Only,3,BMI,0.7923190703018614
+Random Forest,Physiology Only,3,Family_History,0.033056274867310095
+Random Forest,Physiology Only,4,Cycle_Length,0.0
+Random Forest,Physiology Only,4,Cycle_Regularity,0.24806757973694685
+Random Forest,Physiology Only,4,BMI,0.714667757494853
+Random Forest,Physiology Only,4,Family_History,0.037264662768200146
+Random Forest,Physiology Only,5,Cycle_Length,0.0
+Random Forest,Physiology Only,5,Cycle_Regularity,0.3020103622172654
+Random Forest,Physiology Only,5,BMI,0.6647811871412931
+Random Forest,Physiology Only,5,Family_History,0.03320845064144157
+XGBoost,Physiology Only,1,Cycle_Length,0.0
+XGBoost,Physiology Only,1,Cycle_Regularity,0.6513758696820716
+XGBoost,Physiology Only,1,BMI,0.19289057244197388
+XGBoost,Physiology Only,1,Family_History,0.15573355787595447
+XGBoost,Physiology Only,2,Cycle_Length,0.0
+XGBoost,Physiology Only,2,Cycle_Regularity,0.5904767435221651
+XGBoost,Physiology Only,2,BMI,0.23097425069564026
+XGBoost,Physiology Only,2,Family_History,0.17854900578219465
+XGBoost,Physiology Only,3,Cycle_Length,0.0
+XGBoost,Physiology Only,3,Cycle_Regularity,0.6201413387018043
+XGBoost,Physiology Only,3,BMI,0.18857561979962528
+XGBoost,Physiology Only,3,Family_History,0.1912830414985704
+XGBoost,Physiology Only,4,Cycle_Length,0.0
+XGBoost,Physiology Only,4,Cycle_Regularity,0.6800522702924569
+XGBoost,Physiology Only,4,BMI,0.14390635275980304
+XGBoost,Physiology Only,4,Family_History,0.17604137694774005
+XGBoost,Physiology Only,5,Cycle_Length,0.0
+XGBoost,Physiology Only,5,Cycle_Regularity,0.7078921322758277
+XGBoost,Physiology Only,5,BMI,0.12429313357431493
+XGBoost,Physiology Only,5,Family_History,0.1678147341498574
+SVM (RBF Kernel),Physiology Only,1,Cycle_Length,0.0
+SVM (RBF Kernel),Physiology Only,1,Cycle_Regularity,0.9333333333333336
+SVM (RBF Kernel),Physiology Only,1,BMI,0.0032520325203250714
+SVM (RBF Kernel),Physiology Only,1,Family_History,-0.06341463414634142
+SVM (RBF Kernel),Physiology Only,2,Cycle_Length,0.0
+SVM (RBF Kernel),Physiology Only,2,Cycle_Regularity,0.9327770050996758
+SVM (RBF Kernel),Physiology Only,2,BMI,0.021789522484932673
+SVM (RBF Kernel),Physiology Only,2,Family_History,0.045433472415391606
+SVM (RBF Kernel),Physiology Only,3,Cycle_Length,0.0
+SVM (RBF Kernel),Physiology Only,3,Cycle_Regularity,0.7569644572526422
+SVM (RBF Kernel),Physiology Only,3,BMI,-0.13928914505283366
+SVM (RBF Kernel),Physiology Only,3,Family_History,-0.10374639769452422
+SVM (RBF Kernel),Physiology Only,4,Cycle_Length,0.0
+SVM (RBF Kernel),Physiology Only,4,Cycle_Regularity,0.5978428351309701
+SVM (RBF Kernel),Physiology Only,4,BMI,-0.036979969183359315
+SVM (RBF Kernel),Physiology Only,4,Family_History,-0.36517719568567053
+SVM (RBF Kernel),Physiology Only,5,Cycle_Length,0.0
+SVM (RBF Kernel),Physiology Only,5,Cycle_Regularity,0.15163398692810431
+SVM (RBF Kernel),Physiology Only,5,BMI,0.7620915032679737
+SVM (RBF Kernel),Physiology Only,5,Family_History,-0.08627450980392186
+Random Forest,Combined,1,HRV_SDNN_Estimate,0.16013643833324345
+Random Forest,Combined,1,P_Wave_Dispersion,0.23622223082918664
+Random Forest,Combined,1,SDNN_MeanRR_Ratio,0.1316134418379692
+Random Forest,Combined,1,QTc_Bazett,0.07351653655016092
+Random Forest,Combined,1,PR_Interval,0.16007963110963433
+Random Forest,Combined,1,T_Wave_Duration,0.13305398498783724
+Random Forest,Combined,1,Cycle_Length,0.0
+Random Forest,Combined,1,Cycle_Regularity,0.028262810565481196
+Random Forest,Combined,1,BMI,0.06472619717764706
+Random Forest,Combined,1,Family_History,0.012388728608839935
+Random Forest,Combined,2,HRV_SDNN_Estimate,0.14057250111091615
+Random Forest,Combined,2,P_Wave_Dispersion,0.2145686823488461
+Random Forest,Combined,2,SDNN_MeanRR_Ratio,0.13486964805352486
+Random Forest,Combined,2,QTc_Bazett,0.09529276647936338
+Random Forest,Combined,2,PR_Interval,0.1827458553566434
+Random Forest,Combined,2,T_Wave_Duration,0.12029159032449861
+Random Forest,Combined,2,Cycle_Length,0.0
+Random Forest,Combined,2,Cycle_Regularity,0.021761190663553035
+Random Forest,Combined,2,BMI,0.07505677810158494
+Random Forest,Combined,2,Family_History,0.014840987561069647
+Random Forest,Combined,3,HRV_SDNN_Estimate,0.14503714147557187
+Random Forest,Combined,3,P_Wave_Dispersion,0.2875430326440263
+Random Forest,Combined,3,SDNN_MeanRR_Ratio,0.1296951826797183
+Random Forest,Combined,3,QTc_Bazett,0.07403331979870134
+Random Forest,Combined,3,PR_Interval,0.1330856859496859
+Random Forest,Combined,3,T_Wave_Duration,0.111222742110723
+Random Forest,Combined,3,Cycle_Length,0.0
+Random Forest,Combined,3,Cycle_Regularity,0.03149692505329123
+Random Forest,Combined,3,BMI,0.07043972650452375
+Random Forest,Combined,3,Family_History,0.01744624378375834
+Random Forest,Combined,4,HRV_SDNN_Estimate,0.18168735999588986
+Random Forest,Combined,4,P_Wave_Dispersion,0.21185201452599828
+Random Forest,Combined,4,SDNN_MeanRR_Ratio,0.10556146953933995
+Random Forest,Combined,4,QTc_Bazett,0.04615380861560796
+Random Forest,Combined,4,PR_Interval,0.21103228918807232
+Random Forest,Combined,4,T_Wave_Duration,0.13267392283509694
+Random Forest,Combined,4,Cycle_Length,0.0
+Random Forest,Combined,4,Cycle_Regularity,0.04291836622826611
+Random Forest,Combined,4,BMI,0.05420518311572206
+Random Forest,Combined,4,Family_History,0.013915585956006301
+Random Forest,Combined,5,HRV_SDNN_Estimate,0.14977871328338296
+Random Forest,Combined,5,P_Wave_Dispersion,0.22566803199017788
+Random Forest,Combined,5,SDNN_MeanRR_Ratio,0.15104205732519127
+Random Forest,Combined,5,QTc_Bazett,0.08542957584563109
+Random Forest,Combined,5,PR_Interval,0.15122483510687698
+Random Forest,Combined,5,T_Wave_Duration,0.10424120148644389
+Random Forest,Combined,5,Cycle_Length,0.0
+Random Forest,Combined,5,Cycle_Regularity,0.055377100838403345
+Random Forest,Combined,5,BMI,0.06322263115921015
+Random Forest,Combined,5,Family_History,0.014015852964682558
+XGBoost,Combined,1,HRV_SDNN_Estimate,0.10641628174994498
+XGBoost,Combined,1,P_Wave_Dispersion,0.4712132101794284
+XGBoost,Combined,1,SDNN_MeanRR_Ratio,0.05761067794603154
+XGBoost,Combined,1,QTc_Bazett,0.0583026059425524
+XGBoost,Combined,1,PR_Interval,0.09978426638146787
+XGBoost,Combined,1,T_Wave_Duration,0.04438667172960957
+XGBoost,Combined,1,Cycle_Length,0.0
+XGBoost,Combined,1,Cycle_Regularity,0.06024655004065028
+XGBoost,Combined,1,BMI,0.04560800820173355
+XGBoost,Combined,1,Family_History,0.05643172782858141
+XGBoost,Combined,2,HRV_SDNN_Estimate,0.10466731554146944
+XGBoost,Combined,2,P_Wave_Dispersion,0.4405700952676517
+XGBoost,Combined,2,SDNN_MeanRR_Ratio,0.06237699964297376
+XGBoost,Combined,2,QTc_Bazett,0.06993089759580767
+XGBoost,Combined,2,PR_Interval,0.10206038713951457
+XGBoost,Combined,2,T_Wave_Duration,0.05352829506399342
+XGBoost,Combined,2,Cycle_Length,0.0
+XGBoost,Combined,2,Cycle_Regularity,0.04986079884407816
+XGBoost,Combined,2,BMI,0.04235016268836668
+XGBoost,Combined,2,Family_History,0.07465504821614462
+XGBoost,Combined,3,HRV_SDNN_Estimate,0.08400958688632147
+XGBoost,Combined,3,P_Wave_Dispersion,0.5159423158868723
+XGBoost,Combined,3,SDNN_MeanRR_Ratio,0.043445408017760395
+XGBoost,Combined,3,QTc_Bazett,0.04992904532145691
+XGBoost,Combined,3,PR_Interval,0.0756352528495353
+XGBoost,Combined,3,T_Wave_Duration,0.037917684004721654
+XGBoost,Combined,3,Cycle_Length,0.0
+XGBoost,Combined,3,Cycle_Regularity,0.09558928760653376
+XGBoost,Combined,3,BMI,0.03844823243995339
+XGBoost,Combined,3,Family_History,0.05908318698684471
+XGBoost,Combined,4,HRV_SDNN_Estimate,0.25296596411174854
+XGBoost,Combined,4,P_Wave_Dispersion,0.3880014966724965
+XGBoost,Combined,4,SDNN_MeanRR_Ratio,0.03663851365698752
+XGBoost,Combined,4,QTc_Bazett,0.038597911870666274
+XGBoost,Combined,4,PR_Interval,0.1286165450260152
+XGBoost,Combined,4,T_Wave_Duration,0.040518336100727075
+XGBoost,Combined,4,Cycle_Length,0.0
+XGBoost,Combined,4,Cycle_Regularity,0.05379982742966764
+XGBoost,Combined,4,BMI,0.030932235559919277
+XGBoost,Combined,4,Family_History,0.029929169571771958
+XGBoost,Combined,5,HRV_SDNN_Estimate,0.11376551605668568
+XGBoost,Combined,5,P_Wave_Dispersion,0.42335412363087394
+XGBoost,Combined,5,SDNN_MeanRR_Ratio,0.059496469974728225
+XGBoost,Combined,5,QTc_Bazett,0.0597615280889554
+XGBoost,Combined,5,PR_Interval,0.09119820051203963
+XGBoost,Combined,5,T_Wave_Duration,0.03462438078973408
+XGBoost,Combined,5,Cycle_Length,0.0
+XGBoost,Combined,5,Cycle_Regularity,0.10099983730913178
+XGBoost,Combined,5,BMI,0.03401310539167491
+XGBoost,Combined,5,Family_History,0.08278683824617634
+SVM (RBF Kernel),Combined,1,HRV_SDNN_Estimate,0.06333333333333319
+SVM (RBF Kernel),Combined,1,P_Wave_Dispersion,0.13000000000000017
+SVM (RBF Kernel),Combined,1,SDNN_MeanRR_Ratio,0.09666666666666653
+SVM (RBF Kernel),Combined,1,QTc_Bazett,0.14333333333333326
+SVM (RBF Kernel),Combined,1,PR_Interval,0.13999999999999996
+SVM (RBF Kernel),Combined,1,T_Wave_Duration,0.06833333333333322
+SVM (RBF Kernel),Combined,1,Cycle_Length,0.0
+SVM (RBF Kernel),Combined,1,Cycle_Regularity,0.20833333333333343
+SVM (RBF Kernel),Combined,1,BMI,0.11
+SVM (RBF Kernel),Combined,1,Family_History,-0.04000000000000032
+SVM (RBF Kernel),Combined,2,HRV_SDNN_Estimate,0.0750893921334923
+SVM (RBF Kernel),Combined,2,P_Wave_Dispersion,0.29916567342073896
+SVM (RBF Kernel),Combined,2,SDNN_MeanRR_Ratio,0.06197854588796196
+SVM (RBF Kernel),Combined,2,QTc_Bazett,0.1942789034564958
+SVM (RBF Kernel),Combined,2,PR_Interval,0.19308700834326578
+SVM (RBF Kernel),Combined,2,T_Wave_Duration,0.040524433849821184
+SVM (RBF Kernel),Combined,2,Cycle_Length,0.0
+SVM (RBF Kernel),Combined,2,Cycle_Regularity,0.0834326579261024
+SVM (RBF Kernel),Combined,2,BMI,0.039332538736591156
+SVM (RBF Kernel),Combined,2,Family_History,0.013110846245530463
+SVM (RBF Kernel),Combined,3,HRV_SDNN_Estimate,0.1072026800670017
+SVM (RBF Kernel),Combined,3,P_Wave_Dispersion,0.2730318257956448
+SVM (RBF Kernel),Combined,3,SDNN_MeanRR_Ratio,0.1055276381909549
+SVM (RBF Kernel),Combined,3,QTc_Bazett,0.06867671691792307
+SVM (RBF Kernel),Combined,3,PR_Interval,0.20435510887772187
+SVM (RBF Kernel),Combined,3,T_Wave_Duration,0.053601340033501
+SVM (RBF Kernel),Combined,3,Cycle_Length,0.0
+SVM (RBF Kernel),Combined,3,Cycle_Regularity,0.11222780569514243
+SVM (RBF Kernel),Combined,3,BMI,-0.02345058626465642
+SVM (RBF Kernel),Combined,3,Family_History,-0.051926298157453685
+SVM (RBF Kernel),Combined,4,HRV_SDNN_Estimate,0.25706940874036005
+SVM (RBF Kernel),Combined,4,P_Wave_Dispersion,0.053984575835475675
+SVM (RBF Kernel),Combined,4,SDNN_MeanRR_Ratio,0.2030848329048841
+SVM (RBF Kernel),Combined,4,QTc_Bazett,-0.010282776349614161
+SVM (RBF Kernel),Combined,4,PR_Interval,0.22365038560411307
+SVM (RBF Kernel),Combined,4,T_Wave_Duration,0.010282776349614354
+SVM (RBF Kernel),Combined,4,Cycle_Length,0.0
+SVM (RBF Kernel),Combined,4,Cycle_Regularity,0.14910025706940877
+SVM (RBF Kernel),Combined,4,BMI,0.017994858611825374
+SVM (RBF Kernel),Combined,4,Family_History,-0.07455012853470432
+SVM (RBF Kernel),Combined,5,HRV_SDNN_Estimate,0.13910761154855633
+SVM (RBF Kernel),Combined,5,P_Wave_Dispersion,0.34514435695538054
+SVM (RBF Kernel),Combined,5,SDNN_MeanRR_Ratio,0.1758530183727033
+SVM (RBF Kernel),Combined,5,QTc_Bazett,-0.026246719160105122
+SVM (RBF Kernel),Combined,5,PR_Interval,0.21784776902887135
+SVM (RBF Kernel),Combined,5,T_Wave_Duration,0.05118110236220454
+SVM (RBF Kernel),Combined,5,Cycle_Length,0.0
+SVM (RBF Kernel),Combined,5,Cycle_Regularity,-0.031496062992126005
+SVM (RBF Kernel),Combined,5,BMI,-0.01049868766404212
+SVM (RBF Kernel),Combined,5,Family_History,-0.00262467191601062

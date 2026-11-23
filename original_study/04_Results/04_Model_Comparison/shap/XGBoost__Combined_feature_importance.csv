@@ -1,0 +1,13 @@
+Feature,Mean |SHAP|
+P_Wave_Dispersion,1.6568369
+PR_Interval,1.2034644
+SDNN_MeanRR_Ratio,0.52933824
+T_Wave_Duration,0.5147015
+HRV_SDNN_Estimate,0.43562734
+BMI,0.40076515
+QTc_Bazett,0.35115698
+Cycle_Regularity_Irregular,0.19803408
+Family_History_No,0.04775323
+Cycle_Regularity_Regular,0.040502552
+Family_History_Yes,0.0035436014
+Cycle_Length,0.0

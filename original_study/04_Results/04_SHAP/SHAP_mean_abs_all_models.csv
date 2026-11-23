@@ -1,0 +1,49 @@
+Feature,Mean |SHAP|,Model,Feature Set
+P_Wave_Dispersion,0.1830947058579129,Random Forest,ECG Only
+PR_Interval,0.09934035675911856,Random Forest,ECG Only
+HRV_SDNN_Estimate,0.08657402452174877,Random Forest,ECG Only
+SDNN_MeanRR_Ratio,0.05134046188233939,Random Forest,ECG Only
+QTc_Bazett,0.035601904472095235,Random Forest,ECG Only
+T_Wave_Duration,0.027414955820783748,Random Forest,ECG Only
+P_Wave_Dispersion,1.6980040073394775,XGBoost,ECG Only
+PR_Interval,1.2822418212890625,XGBoost,ECG Only
+SDNN_MeanRR_Ratio,0.5646939873695374,XGBoost,ECG Only
+T_Wave_Duration,0.5304262638092041,XGBoost,ECG Only
+HRV_SDNN_Estimate,0.4753479063510895,XGBoost,ECG Only
+QTc_Bazett,0.34229516983032227,XGBoost,ECG Only
+BMI,0.17713637483082373,Random Forest,Physiology Only
+Cycle_Regularity_Regular,0.08189526930985125,Random Forest,Physiology Only
+Cycle_Regularity_Irregular,0.07067450090017605,Random Forest,Physiology Only
+Family_History_No,0.021718839100111378,Random Forest,Physiology Only
+Family_History_Yes,0.017472944462673903,Random Forest,Physiology Only
+Cycle_Length,0.0,Random Forest,Physiology Only
+BMI,1.1372898817062378,XGBoost,Physiology Only
+Cycle_Regularity_Irregular,0.5469013452529907,XGBoost,Physiology Only
+Cycle_Regularity_Regular,0.18954463303089142,XGBoost,Physiology Only
+Family_History_No,0.04909634217619896,XGBoost,Physiology Only
+Family_History_Yes,0.0065324315801262856,XGBoost,Physiology Only
+Cycle_Length,0.0,XGBoost,Physiology Only
+P_Wave_Dispersion,0.1577762785025621,Random Forest,Combined
+PR_Interval,0.07974325085733326,Random Forest,Combined
+HRV_SDNN_Estimate,0.07772074960784164,Random Forest,Combined
+SDNN_MeanRR_Ratio,0.04738843733375402,Random Forest,Combined
+T_Wave_Duration,0.033440976235774966,Random Forest,Combined
+QTc_Bazett,0.029651931634517716,Random Forest,Combined
+BMI,0.015998458736270395,Random Forest,Combined
+Cycle_Regularity_Irregular,0.013505194338781666,Random Forest,Combined
+Cycle_Regularity_Regular,0.013252252284970581,Random Forest,Combined
+Family_History_Yes,0.0025197859224350156,Random Forest,Combined
+Family_History_No,0.0018892419044745556,Random Forest,Combined
+Cycle_Length,0.0,Random Forest,Combined
+P_Wave_Dispersion,1.6568368673324585,XGBoost,Combined
+PR_Interval,1.203464388847351,XGBoost,Combined
+SDNN_MeanRR_Ratio,0.5293382406234741,XGBoost,Combined
+T_Wave_Duration,0.5147014856338501,XGBoost,Combined
+HRV_SDNN_Estimate,0.4356273412704468,XGBoost,Combined
+BMI,0.40076515078544617,XGBoost,Combined
+QTc_Bazett,0.35115697979927063,XGBoost,Combined
+Cycle_Regularity_Irregular,0.19803407788276672,XGBoost,Combined
+Family_History_No,0.0477532297372818,XGBoost,Combined
+Cycle_Regularity_Regular,0.040502551943063736,XGBoost,Combined
+Family_History_Yes,0.003543601371347904,XGBoost,Combined
+Cycle_Length,0.0,XGBoost,Combined

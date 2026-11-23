@@ -1,0 +1,7 @@
+Feature,Mean |SHAP|
+BMI,1.1372899
+Cycle_Regularity_Irregular,0.54690135
+Cycle_Regularity_Regular,0.18954463
+Family_History_No,0.049096342
+Family_History_Yes,0.0065324316
+Cycle_Length,0.0

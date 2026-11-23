@@ -1,0 +1,2 @@
+Sample Count,Class Balance,Quality Score,Column Shapes Score,Column Pair Trends Score,Mean Correlation Error,Maximum Correlation Error,Mean KS Statistic,Mean Wasserstein Distance,Quality Score >= 0.90,Mean Correlation Error <= 0.10,Mean KS Statistic <= 0.15,Certification Status
+150,Normal: 80 (53.33%); PCOS: 70 (46.67%),0.7852767804570712,0.8492592592592593,0.7212943016548831,0.23566266328534707,0.6436166180968739,0.19333333333333333,0.2064555059464436,False,False,False,REJECTED
