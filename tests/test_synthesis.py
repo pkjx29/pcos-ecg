@@ -49,6 +49,14 @@ def test_sampling_is_reproducible():
     pd.testing.assert_frame_equal(a, b)
 
 
+def test_column_with_no_values_stays_missing_instead_of_breaking_the_fit():
+    X, y = _table()
+    X["P_Wave_Dispersion"] = np.nan  # e.g. the scipy backend cannot measure it
+    Xs, ys = make_synthesizer("class_conditional_gaussian", seed=0).fit(X, y).sample({0: 4, 1: 4})
+    assert Xs["P_Wave_Dispersion"].isna().all()
+    assert Xs.drop(columns="P_Wave_Dispersion").notna().all().all()
+
+
 def test_unknown_method_rejected():
     with pytest.raises(ValueError):
         make_synthesizer("bayesian_magic")

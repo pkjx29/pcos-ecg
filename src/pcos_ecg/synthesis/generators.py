@@ -74,7 +74,7 @@ class ClassConditionalGaussian:
 
 
 class SDVSynthesizer:
-    """SDV Gaussian Copula or CTGAN, sampled per class with SDV's conditional sampling."""
+    """SDV Gaussian Copula or CTGAN, with the label modelled as a column and rows kept per class."""
 
     def __init__(
         self, kind: str, categorical: list[str] | None = None, seed: int = 42, epochs: int = 300
@@ -113,20 +113,34 @@ class SDVSynthesizer:
         self.model.fit({"t": data})
         return self
 
-    def sample(self, counts: dict, seed: int | None = None) -> tuple[pd.DataFrame, np.ndarray]:
-        from sdv.sampling import Condition
+    def sample(
+        self, counts: dict, seed: int | None = None, max_batches: int = 50
+    ) -> tuple[pd.DataFrame, np.ndarray]:
+        """Draw plain batches and keep rows per class until each count is met.
 
+        SDV's conditional sampling rejects rows one batch at a time and can take minutes for
+        CTGAN on a tiny table; filling classes from ordinary batches is equivalent and fast.
+        """
         _seed_everything(self.seed if seed is None else seed)
-        conditions = [
-            Condition(num_rows=int(n), column_values={LABEL: cls})
-            for cls, n in counts.items()
-            if n > 0
-        ]
-        if not conditions:
+        need = {cls: int(n) for cls, n in counts.items() if n > 0}
+        if not need:
             return pd.DataFrame(columns=self.columns), np.array([], dtype=int)
-        out = self.model.sample_from_conditions(conditions)
-        out = out["t"] if isinstance(out, dict) else out
-        return out[self.columns].reset_index(drop=True), out[LABEL].to_numpy()
+        batch = max(200, 2 * sum(need.values()))
+        kept: dict = {cls: [] for cls in need}
+        for _ in range(max_batches):
+            out = self.model.sample(batch)
+            out = out["t"] if isinstance(out, dict) else out
+            for cls in need:
+                have = sum(len(f) for f in kept[cls])
+                if have < need[cls]:
+                    kept[cls].append(out[out[LABEL] == cls].head(need[cls] - have))
+            if all(sum(len(f) for f in kept[c]) >= n for c, n in need.items()):
+                break
+        else:
+            short = {c: n - sum(len(f) for f in kept[c]) for c, n in need.items()}
+            raise RuntimeError(f"{self.kind} produced too few rows for some classes: {short}")
+        rows = pd.concat([f for parts in kept.values() for f in parts], ignore_index=True)
+        return rows[self.columns], rows[LABEL].to_numpy()
 
 
 def _seed_everything(seed: int) -> None:
@@ -139,12 +153,34 @@ def _seed_everything(seed: int) -> None:
         pass
 
 
+class _SkipEmptyColumns:
+    """Leaves columns with no values out of fitting and returns them empty in samples, so a
+    feature that could not be measured stays missing instead of breaking the fit."""
+
+    def __init__(self, inner):
+        self.inner = inner
+
+    def fit(self, X: pd.DataFrame, y: np.ndarray):
+        self.columns = list(X.columns)
+        self.empty = [c for c in X.columns if X[c].isna().all()]
+        self.inner.fit(X.drop(columns=self.empty), y)
+        return self
+
+    def sample(self, counts: dict, seed: int | None = None):
+        Xs, ys = self.inner.sample(counts, seed=seed)
+        for col in self.empty:
+            Xs[col] = np.nan
+        return Xs[self.columns], ys
+
+
 def make_synthesizer(method: str, categorical: list[str] | None = None, seed: int = 42, **opts):
     if method == "class_conditional_gaussian":
-        return ClassConditionalGaussian(categorical, seed=seed, clip=opts.get("clip", True))
-    if method in SDV_METHODS:
-        return SDVSynthesizer(method, categorical, seed=seed, epochs=opts.get("epochs", 300))
-    raise ValueError(f"Unknown synthesis method {method!r}; choose from {METHODS}")
+        inner = ClassConditionalGaussian(categorical, seed=seed, clip=opts.get("clip", True))
+    elif method in SDV_METHODS:
+        inner = SDVSynthesizer(method, categorical, seed=seed, epochs=opts.get("epochs", 300))
+    else:
+        raise ValueError(f"Unknown synthesis method {method!r}; choose from {METHODS}")
+    return _SkipEmptyColumns(inner)
 
 
 def rows_needed(y_train: np.ndarray, target_counts: dict) -> dict:

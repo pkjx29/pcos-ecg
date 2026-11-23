@@ -52,6 +52,7 @@ def compare_synthesizers(
     epochs: int = 300,
 ) -> pd.DataFrame:
     y = np.asarray(y)
+    X = X.drop(columns=[c for c in X.columns if X[c].isna().all()])
     real = X.fillna(X.median(numeric_only=True)).assign(label=y)
     numeric = [c for c in X.columns if c not in categorical]
     shares = pd.Series(y).value_counts(normalize=True)
