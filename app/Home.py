@@ -118,7 +118,7 @@ with tab_ecg:
                 }
                 for k, v in res.values.items()
             ]
-            st.dataframe(pd.DataFrame(rows), hide_index=True, use_container_width=True)
+            st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
             st.caption(
                 "Automatic single-lead estimates. P-wave dispersion is not computed: it "
                 "needs several leads. BMI and cycle data are never inferred from ECG."
@@ -149,7 +149,7 @@ with tab_models:
         )
         pivot = summary.pivot(index="model", columns="condition", values=f"{metric}_mean")
         st.bar_chart(pivot)
-        st.dataframe(summary, hide_index=True, use_container_width=True)
+        st.dataframe(summary, hide_index=True, width="stretch")
         if meta["warnings"]:
             st.markdown("**Warnings**")
             for w in meta["warnings"]:

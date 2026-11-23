@@ -11,6 +11,7 @@ from __future__ import annotations
 from functools import partial
 
 from imblearn.pipeline import Pipeline
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.dummy import DummyClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
@@ -37,14 +38,16 @@ def make_classifier(name: str, condition: str, n_pos: int, n_neg: int, seed: int
             n_jobs=1,
         )
     if name == "svm":
-        return SVC(
+        # Platt scaling via CalibratedClassifierCV, as scikit-learn now recommends instead of
+        # SVC(probability=True). ensemble=False keeps one SVM fitted on the whole training fold.
+        svc = SVC(
             kernel="rbf",
             C=1.0,
             gamma="scale",
-            probability=True,
             class_weight="balanced" if weighted else None,
             random_state=seed,
         )
+        return CalibratedClassifierCV(svc, method="sigmoid", cv=3, ensemble=False)
     if name == "xgboost":
         return XGBClassifier(
             n_estimators=200,
