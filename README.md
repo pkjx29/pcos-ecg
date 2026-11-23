@@ -93,7 +93,13 @@ Details: [`docs/architecture.md`](docs/architecture.md),
 
 Study files go in `data/private/` (git-ignored); see [`data/README.md`](data/README.md).
 
+Kardia PDF exports can be converted first. List each PDF with a coded ID in
+`data/private/kardia/mapping.csv` (columns `file, subject_id, record_id`); the importer reads
+only the black trace strokes and never the PDF's text, so names and dates of birth are not
+touched.
+
 ```bash
+pcos-ecg import-kardia --mapping data/private/kardia/mapping.csv --out data/private/ecg_long.csv
 cp configs/data_schema.example.yaml configs/local_data.yaml        # edit column names
 cp configs/experiment.example.yaml  configs/local_experiment.yaml
 pcos-ecg validate-data    --config configs/local_data.yaml
