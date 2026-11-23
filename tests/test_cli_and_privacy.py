@@ -1,4 +1,6 @@
+import csv
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -56,6 +58,36 @@ def test_no_data_files_are_tracked():
         f
         for f in tracked
         if f.startswith(("data/private", "runs/"))
-        or f.endswith((".csv", ".edf", ".dat", ".joblib", ".pkl"))
+        or (f.endswith((".csv", ".edf", ".dat", ".joblib", ".pkl")) and not _is_aggregate_result(f))
     ]
     assert risky == []
+
+
+AGGREGATE_DIR = "original_study/04_Results/"
+ID_COLUMN = re.compile(r"subject|participant|record_id|patient|\bname\b", re.IGNORECASE)
+
+
+def _is_aggregate_result(path: str) -> bool:
+    """Published summary tables from the original study: CSVs whose columns carry no IDs."""
+    if not (path.startswith(AGGREGATE_DIR) and path.endswith(".csv")):
+        return False
+    with (REPO / path).open(encoding="utf-8", errors="replace") as fh:
+        header = next(csv.reader(fh), [])
+    return not any(ID_COLUMN.search(col) for col in header)
+
+
+def test_original_study_has_no_personal_details():
+    root = REPO / "original_study"
+    if not root.exists():
+        pytest.skip("original_study/ not present")
+    pattern = re.compile(
+        r"[\w.+-]+@[\w-]+\.(com|in|org|edu)|/content/drive|drive\.mount|/Users/", re.IGNORECASE
+    )
+    hits = [
+        f"{p.relative_to(REPO)}: {m.group(0)}"
+        for p in root.rglob("*")
+        if p.suffix in {".py", ".ipynb", ".csv", ".txt", ".json", ".md"}
+        for m in [pattern.search(p.read_text(encoding="utf-8", errors="replace"))]
+        if m
+    ]
+    assert hits == []
