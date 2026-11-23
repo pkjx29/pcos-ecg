@@ -20,14 +20,16 @@ paper was accepted at AIKP'26 (Paper ID 141).
 | | |
 |---|---|
 | ✅ The full pipeline, rebuilt as a tested Python package | ❌ Volunteer recordings or labels |
-| ✅ A synthetic ECG generator so the pipeline runs end to end | ❌ The paper's results |
-| ✅ Templates for documenting the protocol and data | ❌ Any trained model |
+| ✅ A synthetic ECG generator so the pipeline runs end to end | ❌ Any trained model |
+| ✅ The original team notebooks and their aggregate results ([`original_study/`](original_study/)) | ❌ The paper PDF |
+| ✅ Templates for documenting the protocol and data | |
 
-**The code here is a rebuild.** The original team code is not available, so this
-repository re-implements the method from the project description. It is the same
-approach, written again with tests. It is not the code that produced the paper's
-numbers, and running it on the demo data does not reproduce them. See
-[`docs/claims_ledger.md`](docs/claims_ledger.md).
+**Two kinds of code live here.** [`original_study/`](original_study/) holds the notebooks
+the team actually ran for the paper, published with the team's permission, plus their
+aggregate results; read its README for three important caveats. Everything else is a
+later rebuild of the method with tests and stricter evaluation. The rebuild is not the
+code that produced the paper's numbers, and running it on the demo data does not
+reproduce them. See [`docs/claims_ledger.md`](docs/claims_ledger.md).
 
 ## Quick start
 
